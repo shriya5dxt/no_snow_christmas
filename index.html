@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No Snow Christmas — Warm-Weather Holiday Itineraries</title>
+  <meta name="description" content="Christmas itineraries for sun, sand and warm-weather festive traditions around the world." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">☀️ Swap snowflakes for sunshine</p>
+      <h1>No Snow Christmas</h1>
+      <p class="tagline">Hand-picked itineraries for celebrating the holidays somewhere warm.</p>
+      <button id="surprise" class="btn btn-primary">🎁 Surprise me</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="filters" aria-label="Filter itineraries">
+      <div class="filter">
+        <label for="search">Search</label>
+        <input id="search" type="search" placeholder="Beach, Goa, wine…" />
+      </div>
+      <div class="filter">
+        <label for="vibe">Vibe</label>
+        <select id="vibe">
+          <option value="">Any vibe</option>
+          <option value="beach">🏖️ Beach & relax</option>
+          <option value="adventure">🧗 Adventure</option>
+          <option value="culture">🎭 Culture & traditions</option>
+          <option value="city">🌆 City lights</option>
+          <option value="food">🍽️ Food & drink</option>
+          <option value="family">👨‍👩‍👧 Family friendly</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="region">Region</label>
+        <select id="region">
+          <option value="">Anywhere</option>
+          <option value="Asia">Asia</option>
+          <option value="Oceania">Oceania</option>
+          <option value="Africa">Africa</option>
+          <option value="Americas">Americas</option>
+          <option value="Europe">Europe</option>
+          <option value="Middle East">Middle East</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="budget">Budget</label>
+        <select id="budget">
+          <option value="">Any budget</option>
+          <option value="1">$ Budget</option>
+          <option value="2">$$ Mid-range</option>
+          <option value="3">$$$ Splurge</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="days">Max days</label>
+        <select id="days">
+          <option value="">Any length</option>
+          <option value="5">Up to 5</option>
+          <option value="6">Up to 6</option>
+          <option value="7">Up to 7</option>
+        </select>
+      </div>
+      <button id="reset" class="btn btn-ghost">Reset</button>
+    </section>
+
+    <p id="count" class="count" aria-live="polite"></p>
+    <section id="grid" class="grid"></section>
+
+    <section class="favs" id="favs-section" hidden>
+      <h2>⭐ Your shortlist</h2>
+      <ul id="favs"></ul>
+    </section>
+  </main>
+
+  <dialog id="detail">
+    <article>
+      <button class="close" id="close" aria-label="Close">✕</button>
+      <div id="detail-body"></div>
+    </article>
+  </dialog>
+
+  <footer>
+    <p>Made with 🌴 for a sunny Christmas. Check travel advisories, visas and local holiday closures before booking.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
