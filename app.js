@@ -287,14 +287,16 @@ function build(s) {
   // Dec 21 and Dec 26 are travel days only
   Object.assign(days[0], { nav: "Fly in", title: "Travel day: Boston to Phoenix", roads: "BOS → PHX", free: 0, stops: [
     S(0, "Fly Boston → Phoenix", "About 5.5 hours nonstop. Arizona is 2 hours behind Boston, so you gain two hours today.", { key: 1 }),
-    S(1, "Land at Sky Harbor, pick up the car", "Take the shuttle to the Rental Car Center. Six people plus bags means a 7-seater or two cars.", { g: "PHX Sky Harbor Rental Car Center" }),
-    S(2, "Groceries and dinner near home", "Stock up for the week, then an easy dinner and an early night."),
-  ], flags: [["Travel only", "No plans today beyond getting everyone in. If a flight is delayed, nothing else moves."]] });
+    S(1, "Land at Sky Harbor, ride home", "Six people plus bags won't fit in one car: book two Uber/Lyft XLs, or have someone do an airport run."),
+    S(2, "Pick up the rental near home", "Booked at the branch near the house, which is cheaper than the airport. Neighbourhood branches close earlier, so pick it up today. The road trips leave before they open on Dec 22.", { key: 1 }),
+    S(3, "Groceries and dinner near home", "Stock up for the week, then an easy dinner and an early night."),
+  ], flags: [["Travel only", "No plans today beyond getting everyone in and picking up the car. If a flight is delayed, nothing else moves, but check the branch's closing time."]] });
   Object.assign(days[5], { nav: "Fly home", title: "Travel day: Phoenix to Boston", roads: "PHX → BOS", free: 0, stops: [
     S(0, "Pack up and tidy the house", ""),
-    S(1, "Return the car", "Drop it at the Rental Car Center and take the shuttle. Allow 2 hours before the flight.", { key: 1, g: "PHX Sky Harbor Rental Car Center" }),
-    S(2, "Fly Phoenix → Boston", "About 4.5 hours nonstop, and you lose the two hours back.", { key: 1 }),
-  ] });
+    S(1, "Return the car near home", "Back to the same branch. Saturday hours are often short, so confirm them when you book. If they don't line up with the flight, return it on the evening of Dec 24.", { key: 1 }),
+    S(2, "Ride to Sky Harbor", "Two Uber/Lyft XLs, or an airport drop-off. Be there 2 hours before the flight."),
+    S(3, "Fly Phoenix → Boston", "About 4.5 hours nonstop, and you lose the two hours back.", { key: 1 }),
+  ], flags: [["Rental hours", "Neighbourhood branches usually close early on Christmas Eve and stay closed on Christmas Day. Check both pickup and return times before you book."]] });
   days[0].untimed = days[5].untimed = true;
 
   // Road trip: always inside Dec 22–24
@@ -376,7 +378,8 @@ function checklist(days) {
   const pl = new Set(days.flatMap((d) => d.places));
   const items = [
     ["flights", "Flights BOS → PHX Dec 21, PHX → BOS Dec 26, all six", "Holiday-week fares climb fast."],
-    ["car", "A 7-seater, or two cars, at Sky Harbor", "Six people plus bags. Get AWD if you're heading north."],
+    ["car", "A 7-seater, or two cars, from the branch near home", "Cheaper than the airport. Confirm pickup on Mon Dec 21 and return on Sat Dec 26, because neighbourhood branches keep shorter hours. Get AWD if you're heading north."],
+    ["airport-rides", "Airport rides on Dec 21 and Dec 26", "Six people plus bags means two Uber/Lyft XLs, or a friend with a big car."],
   ];
   const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them.",
     "Monument Valley": "The View and Goulding's are the only beds near the park, and they sell out.", Page: "Plenty of hotels, but book with the tour.", Tucson: "Lots of choice." };
