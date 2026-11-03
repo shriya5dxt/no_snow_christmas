@@ -3,96 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>No Snow Christmas — Warm-Weather Holiday Itineraries</title>
-  <meta name="description" content="Christmas itineraries for sun, sand and warm-weather festive traditions around the world." />
-  <link rel="stylesheet" href="styles.css" />
+  <title>Crew Trip Planner: Boston → Phoenix, Dec 21–26</title>
+  <meta name="theme-color" content="#1b1430" />
+  <link rel="stylesheet" href="phx.css" />
+  <script>
+    // Set theme before paint to avoid a flash
+    (function () {
+      var t = localStorage.getItem("crew-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
 </head>
 <body>
+  <nav class="topbar">
+    <a href="index.html" class="brand">🌵 <span>Crew Trip</span></a>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="copy-text" title="Copy plan for WhatsApp">📋 <span>Copy plan</span></button>
+      <button class="icon-btn accent" id="copy-link" title="Copy share link">🔗 <span>Share</span></button>
+      <button class="icon-btn" id="theme" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </nav>
+
   <header class="hero">
+    <svg class="hero-art" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffe9a8" />
+          <stop offset="60%" stop-color="#ffb347" />
+          <stop offset="100%" stop-color="#ff7a45" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <circle class="sun" cx="860" cy="210" r="120" fill="url(#sun)" />
+      <path class="mesa far" d="M0 250 L120 250 L150 205 L300 205 L330 250 L520 250 L560 190 L700 190 L735 250 L1200 250 L1200 320 L0 320Z" />
+      <path class="mesa near" d="M0 285 L210 285 L240 245 L380 245 L410 285 L780 285 L815 230 L990 230 L1025 285 L1200 285 L1200 320 L0 320Z" />
+      <g class="cactus" transform="translate(140 232)"><path d="M10 60 V8 a6 6 0 0 1 12 0 V60 Z M22 34 h8 V18 a5 5 0 0 1 10 0 V40 a6 6 0 0 1 -6 6 H22Z M10 40 H4 a6 6 0 0 1 -6 -6 V24 a5 5 0 0 1 10 0 V30 h2Z" /></g>
+      <g class="cactus" transform="translate(1060 240) scale(.8)"><path d="M10 60 V8 a6 6 0 0 1 12 0 V60 Z M22 34 h8 V18 a5 5 0 0 1 10 0 V40 a6 6 0 0 1 -6 6 H22Z M10 40 H4 a6 6 0 0 1 -6 -6 V24 a5 5 0 0 1 10 0 V30 h2Z" /></g>
+    </svg>
     <div class="hero-inner">
-      <p class="eyebrow">☀️ Swap snowflakes for sunshine</p>
-      <h1>No Snow Christmas</h1>
-      <p class="tagline">Hand-picked itineraries for celebrating the holidays somewhere warm.</p>
-      <button id="surprise" class="btn btn-primary">🎁 Surprise me</button>
+      <p class="eyebrow">Boston → Phoenix · Mon Dec 21 – Sat Dec 26</p>
+      <h1>The Crew Trip Planner</h1>
+      <div class="crew" id="crew"></div>
+      <div class="countdown" id="countdown" aria-live="polite"></div>
     </div>
   </header>
 
-  <main>
-    <section class="filters" aria-label="Filter itineraries">
-      <div class="filter">
-        <label for="search">Search</label>
-        <input id="search" type="search" placeholder="Beach, Goa, wine…" />
+  <main class="layout">
+    <aside class="builder">
+      <div class="card">
+        <div class="builder-head">
+          <h2>🧭 Build the route</h2>
+          <span class="step-count" id="step-count"></span>
+        </div>
+        <div class="progress"><div class="progress-bar" id="progress"></div></div>
+        <div id="questions"></div>
       </div>
-      <div class="filter">
-        <label for="vibe">Vibe</label>
-        <select id="vibe">
-          <option value="">Any vibe</option>
-          <option value="beach">🏖️ Beach & relax</option>
-          <option value="adventure">🧗 Adventure</option>
-          <option value="culture">🎭 Culture & traditions</option>
-          <option value="city">🌆 City lights</option>
-          <option value="food">🍽️ Food & drink</option>
-          <option value="family">👨‍👩‍👧 Family friendly</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="region">Region</label>
-        <select id="region">
-          <option value="">Anywhere</option>
-          <option value="Asia">Asia</option>
-          <option value="Oceania">Oceania</option>
-          <option value="Africa">Africa</option>
-          <option value="Americas">Americas</option>
-          <option value="Europe">Europe</option>
-          <option value="Middle East">Middle East</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="budget">Budget</label>
-        <select id="budget">
-          <option value="">Any budget</option>
-          <option value="1">$ Budget</option>
-          <option value="2">$$ Mid-range</option>
-          <option value="3">$$$ Splurge</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="days">Max days</label>
-        <select id="days">
-          <option value="">Any length</option>
-          <option value="5">Up to 5</option>
-          <option value="6">Up to 6</option>
-          <option value="7">Up to 7</option>
-        </select>
-      </div>
-      <button id="reset" class="btn btn-ghost">Reset</button>
-    </section>
 
-    <a class="crew-cta" href="phx.html">
-      <strong>🌵 Crew Trip Planner: Boston → Phoenix, Dec 21–26 →</strong><br>
-      Apoorv, Khushbu, Sanaa, Bobby, Shriya & Archit: pick a route (Grand Canyon, Sedona, Flagstaff), plan for "what ifs" and vote.
-    </a>
+      <div class="card">
+        <h2>⚡ What if…</h2>
+        <p class="muted">Turn these on to see how the plan changes.</p>
+        <div class="switches">
+          <label class="switch"><input type="checkbox" id="t-snow" /><span class="track"><span class="thumb"></span></span><span>❄️ Snow or ice up north</span></label>
+          <label class="switch"><input type="checkbox" id="t-delay" /><span class="track"><span class="thumb"></span></span><span>✈️ Boston flight lands late</span></label>
+          <label class="switch"><input type="checkbox" id="t-split" /><span class="track"><span class="thumb"></span></span><span>😴 Some want to skip the road trip</span></label>
+        </div>
+      </div>
+    </aside>
 
-    <p id="count" class="count" aria-live="polite"></p>
-    <section id="grid" class="grid"></section>
+    <section class="results">
+      <div class="stats" id="stats"></div>
 
-    <section class="favs" id="favs-section" hidden>
-      <h2>⭐ Your shortlist</h2>
-      <ul id="favs"></ul>
+      <div class="card map-card">
+        <div class="card-head">
+          <h2>🗺️ Route</h2>
+          <span class="pill" id="route-pill"></span>
+        </div>
+        <div class="map-wrap"><svg id="map" viewBox="0 0 300 350" role="img" aria-label="Route map of Arizona"></svg></div>
+        <p class="map-legend"><span class="lg home"></span> Home base <span class="lg on"></span> On the route <span class="lg off"></span> Not this time</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>🗓️ Day by day</h2></div>
+        <ol class="timeline" id="timeline"></ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>🔀 If this happens → we'll do this</h2></div>
+        <div id="ifs" class="ifs"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>🗳️ Crew vote</h2>
+          <span class="pill" id="vote-pill"></span>
+        </div>
+        <p class="muted">Tap a route under your name. Votes are saved in this browser and in the share link, so vote, then send the link on.</p>
+        <div class="voters" id="voters"></div>
+        <div class="tally" id="tally"></div>
+      </div>
     </section>
   </main>
 
-  <dialog id="detail">
-    <article>
-      <button class="close" id="close" aria-label="Close">✕</button>
-      <div id="detail-body"></div>
-    </article>
-  </dialog>
-
-  <footer>
-    <p>Made with 🌴 for a sunny Christmas. Check travel advisories, visas and local holiday closures before booking.</p>
-  </footer>
-
-  <script src="app.js"></script>
+  <footer>Drive times are rough estimates. Check <strong>az511.gov</strong> for roads and <strong>nps.gov/grca</strong> for park alerts before you go.</footer>
+  <div id="toast" class="toast" role="status"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <script src="phx.js"></script>
 </body>
 </html>
