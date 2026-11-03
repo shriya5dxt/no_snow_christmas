@@ -61,13 +61,6 @@ const RIM_NIGHT = "In-park lodges (El Tovar, Bright Angel, Maswik) are steps fro
 
 /* ---------- day templates ---------- */
 const T = {
-  arriveSedona: { nav: "Sedona", title: "Land, then up to red rock country", hrs: 2, roads: "I-17 north", night: "Sedona",
-    nightNote: "West Sedona and the Village of Oak Creek are cheaper than Uptown.", places: ["PHX", "SED"], stops: [
-      landStop(660),
-      S(750, "North on I-17", "Two hours of climbing from saguaro desert to red rock. Sunset Point rest area makes a good halfway stretch.", { s: ["116 mi", "~2 hrs"] }),
-      S(900, "Check in, Sedona", "Drop bags and head straight back out.", { g: "Sedona, AZ" }),
-      airportMesa,
-      S(1110, "Dinner in Uptown Sedona", "Reserve for six. Holiday week is busy.")] },
 
   sedonaToFlag: (fromPhx) => ({ nav: "Sedona → Flagstaff", title: fromPhx ? "Phoenix to red rock to the pines" : "Red rock morning, up to the pines",
     hrs: fromPhx ? 3 : 1, roads: fromPhx ? "I-17 → SR-179 → SR-89A" : "SR-89A through Oak Creek Canyon", night: "Flagstaff",
