@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crew Trip Planner — Boston → Phoenix, Dec 21–26</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero hero-desert">
+    <div class="hero-inner">
+      <p class="eyebrow">🌵 Boston → Phoenix · Mon Dec 21 – Sat Dec 26</p>
+      <h1>The Crew Trip Planner</h1>
+      <p class="tagline">Apoorv · Khushbu · Sanaa · Bobby · Shriya · Archit</p>
+      <p class="tagline small">Pick a route, answer the "what ifs", and the plan rebuilds itself.</p>
+      <a href="index.html" class="btn btn-primary">← All itineraries</a>
+    </div>
+  </header>
+
+  <main class="planner">
+    <section class="panel" id="questions" aria-label="Plan choices"></section>
+
+    <section class="panel" aria-label="What if">
+      <h2>⚡ What if…</h2>
+      <p class="muted">Turn these on to see how the plan changes.</p>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="t-snow" /> ❄️ Snow or ice forecast up north</label>
+        <label class="toggle"><input type="checkbox" id="t-delay" /> ✈️ Flight from Boston lands late on Dec 21</label>
+        <label class="toggle"><input type="checkbox" id="t-split" /> 😴 Some of the crew want to skip the road trip</label>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Itinerary">
+      <div class="plan-head">
+        <h2>🗓️ Our plan</h2>
+        <div class="actions">
+          <button class="btn btn-ghost" id="copy-text">📋 Copy for WhatsApp</button>
+          <button class="btn btn-sea" id="copy-link">🔗 Copy share link</button>
+        </div>
+      </div>
+      <p id="summary" class="summary"></p>
+      <div id="timeline" class="timeline"></div>
+      <div id="ifs" class="ifs"></div>
+    </section>
+
+    <section class="panel" aria-label="Votes">
+      <h2>🗳️ Crew vote: which route?</h2>
+      <p class="muted">Everyone picks a favourite. Votes are saved in this browser and included in the share link, so vote, then send the link to the next person.</p>
+      <div id="votes" class="votes"></div>
+      <p id="tally" class="tally"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Drive times are rough estimates. Check <strong>az511.gov</strong> for road conditions and <strong>nps.gov/grca</strong> for park alerts before you go.</p>
+  </footer>
+  <div id="toast" class="toast" hidden></div>
+  <script src="phx.js"></script>
+</body>
+</html>
