@@ -42,8 +42,6 @@ const ROUTES = {
 /* ---------- stop helper ---------- */
 const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
 
-const landStop = (t) => S(t, "Land at Sky Harbor", "Take the shuttle to the Rental Car Center. Six people plus bags means a 7-seater or two cars.",
-  { key: 1, g: "PHX Sky Harbor Rental Car Center" });
 const sunriseRim = S(440, "Sunrise at Yavapai Point", "Sunrise is around 07:35. Wear every warm layer you brought; it's well below freezing.", { key: 1, g: "Yavapai Point, Grand Canyon AZ" });
 const desertView = (t) => S(t, "Desert View Drive", "East along the rim past Grandview and Lipan Points to the Desert View Watchtower.", { s: ["25 mi", "4 overlooks"], g: "Desert View Watchtower, AZ" });
 const cameron = (t) => S(t, "Lunch at Cameron Trading Post", "Just outside the east entrance. Get the Navajo taco, and fill the tank.", { g: "Cameron Trading Post, AZ" });
@@ -287,16 +285,14 @@ function build(s) {
   // Dec 21 and Dec 26 are travel days only
   Object.assign(days[0], { nav: "Fly in", title: "Travel day: Boston to Phoenix", roads: "BOS → PHX", free: 0, stops: [
     S(0, "Fly Boston → Phoenix", "About 5.5 hours nonstop. Arizona is 2 hours behind Boston, so you gain two hours today.", { key: 1 }),
-    S(1, "Land at Sky Harbor, ride home", "Six people plus bags won't fit in one car: book two Uber/Lyft XLs, or have someone do an airport run."),
-    S(2, "Pick up the rental near home", "Booked at the branch near the house, which is cheaper than the airport. Neighbourhood branches close earlier, so pick it up today. The road trips leave before they open on Dec 22.", { key: 1 }),
-    S(3, "Groceries and dinner near home", "Stock up for the week, then an easy dinner and an early night."),
-  ], flags: [["Travel only", "No plans today beyond getting everyone in and picking up the car. If a flight is delayed, nothing else moves, but check the branch's closing time."]] });
+    S(1, "Land at Sky Harbor, head home", ""),
+    S(2, "Groceries and dinner near home", "Stock up for the week, then an easy dinner and an early night."),
+  ], flags: [["Travel only", "No plans today beyond getting everyone in. If a flight is delayed, nothing else moves."]] });
   Object.assign(days[5], { nav: "Fly home", title: "Travel day: Phoenix to Boston", roads: "PHX → BOS", free: 0, stops: [
     S(0, "Pack up and tidy the house", ""),
-    S(1, "Return the car near home", "Back to the same branch. Saturday hours are often short, so confirm them when you book. If they don't line up with the flight, return it on the evening of Dec 24.", { key: 1 }),
-    S(2, "Ride to Sky Harbor", "Two Uber/Lyft XLs, or an airport drop-off. Be there 2 hours before the flight."),
-    S(3, "Fly Phoenix → Boston", "About 4.5 hours nonstop, and you lose the two hours back.", { key: 1 }),
-  ], flags: [["Rental hours", "Neighbourhood branches usually close early on Christmas Eve and stay closed on Christmas Day. Check both pickup and return times before you book."]] });
+    S(1, "Head to Sky Harbor", "Be there 2 hours before the flight."),
+    S(2, "Fly Phoenix → Boston", "About 4.5 hours nonstop, and you lose the two hours back.", { key: 1 }),
+  ] });
   days[0].untimed = days[5].untimed = true;
 
   // Road trip: always inside Dec 22–24
@@ -318,9 +314,9 @@ function build(s) {
   seq.forEach((tpl, i) => {
     const idx = start + i, d = clone(tpl);
     Object.assign(days[idx], d, { away: true, free: 0, flags: d.flags || [] });
-    if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "AWD or chains, check AZ511 before every drive, and add buffer time. Skip any road that's closed rather than wait it out."]);
+    if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "Check AZ511 before every drive and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.snow && s.route === "day") days[idx].flags.push(["Snow forecast", "Sedona sits around 4,300 ft and usually stays clear. If I-17 is bad, swap this for a Phoenix day."]);
-    if (s.t.split) days[idx].flags.push(["Split crew", "Car 1 takes this trip, car 2 stays in Phoenix and does the downtime plan. Meet back up for Christmas Eve."]);
+    if (s.t.split) days[idx].flags.push(["Split crew", "Part of the crew takes this trip, the rest stay in Phoenix on the downtime plan. Meet back up for Christmas Eve."]);
   });
   if (snowAlt) days[start].flags.unshift(["Plan B is on", s.snow === "sedona" ? "Snow is forecast up north, so this version stays in Sedona and the Verde Valley, below most of it." : "Snow is forecast up north, so this version heads south to Tucson instead."]);
 
@@ -361,7 +357,7 @@ function contingencies(s) {
   const out = [];
   if (NORTH.includes(s.route)) {
     out.push(["If it snows up north", { go: "Go carefully", sedona: "Stay low in Sedona", south: "Head south to Tucson" }[s.snow],
-      { go: "Rent AWD, carry chains, and check AZ511 and the Grand Canyon NPS alerts each morning. Skip any closed road.",
+      { go: "Check AZ511 and the Grand Canyon NPS alerts each morning, drive in daylight, and skip any closed road.",
         sedona: "Swap the high country for Sedona, Jerome and the Verde Valley, all below most of the snow.",
         south: "Swap the high country for Tucson, Saguaro National Park and Tombstone, warm and low." }[s.snow]]);
     out.push(["If a road closes mid-trip", "Stay put", "I-17, I-40, US-180 and AZ-64 all close for storms now and then. Stay where you are and wait for AZ511 to clear it. Avoid 89A through Oak Creek Canyon in ice."]);
@@ -369,7 +365,7 @@ function contingencies(s) {
   if (s.route === "grand") out.push(["If the Valley Drive is muddy", "Go guided", "The dirt loop gets slick after rain or snow. Take a Navajo-guided jeep tour, or watch from the visitor center terrace."]);
   if (s.route === "page") out.push(["If Antelope tours are cancelled", "Lower, or the dam", "Tours close for flash-flood risk. Try Lower Antelope or Antelope Canyon X, or the Glen Canyon Dam overlook."]);
   out.push(["If a flight is delayed", "Nothing moves", "Dec 21 and Dec 26 are travel days only, so a late landing or a late departure doesn't touch the plan."]);
-  out.push(["If some want to rest", "Split the crew", "Two cars: one group does the drive, the other stays on the Phoenix plan. Everyone meets for Christmas Eve."]);
+  out.push(["If some want to rest", "Split the crew", "One group does the drive, the other stays on the Phoenix plan. Everyone meets for Christmas Eve."]);
   out.push(["If it rains in Phoenix", "Go indoors", "Musical Instrument Museum, Heard Museum, or Scottsdale Fashion Square."]);
   return out;
 }
@@ -378,18 +374,15 @@ function checklist(days) {
   const pl = new Set(days.flatMap((d) => d.places));
   const items = [
     ["flights", "Flights BOS → PHX Dec 21, PHX → BOS Dec 26, all six", "Holiday-week fares climb fast."],
-    ["car", "A 7-seater, or two cars, from the branch near home", "Cheaper than the airport. Confirm pickup on Mon Dec 21 and return on Sat Dec 26, because neighbourhood branches keep shorter hours. Get AWD if you're heading north."],
-    ["airport-rides", "Airport rides on Dec 21 and Dec 26", "Six people plus bags means two Uber/Lyft XLs, or a friend with a big car."],
   ];
   const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them.",
     "Monument Valley": "The View and Goulding's are the only beds near the park, and they sell out.", Page: "Plenty of hotels, but book with the tour.", Tucson: "Lots of choice." };
   days.forEach((d, i) => { if (d.night !== "Home") items.push([`stay-${d.night.toLowerCase().replace(/\W+/g, "")}-${i}`, `Rooms in ${d.night}, ${label(i)}, for six`, why[d.night] || ""]); });
   if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
-  if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. With two cars, an America the Beautiful pass may work out cheaper."]);
+  if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. Buy ahead at recreation.gov or pay at the gate."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
   if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 24 morning", "Navajo-guided tours only, and they sell out weeks ahead."]);
   if (pl.has("MV")) items.push(["mv-jeep", "Monument Valley guided jeep tour (optional)", "Gets you into areas the self-drive loop doesn't reach, and it's the backup if the road is muddy."]);
-  if (state.t.snow && state.snow === "go" && NORTH.includes(state.route)) items.push(["chains", "Confirm AWD on the rental and pick up chains", "AZ511 can require chains on US-180 and AZ-64."]);
   if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A, on the Navajo Nation and along parts of the rim."]);
   if (state.fun.includes("balloon")) items.push(["balloon", "Sunrise balloon ride", "Holiday weeks book up. Pick an early date to leave a backup day."]);
   if (state.fun.includes("scottsdale")) items.push(["scottsdale", "Scottsdale dinner reservation for six", "Old Town gets busy over the holidays."]);
