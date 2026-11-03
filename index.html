@@ -1,154 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crew Trip Planner: Boston → Phoenix, Dec 21–26</title>
-  <meta name="theme-color" content="#1b1430" />
-  <link rel="stylesheet" href="phx.css" />
-  <script>
-    // Set theme before paint to avoid a flash
-    (function () {
-      var t = localStorage.getItem("crew-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.dataset.theme = t;
-    })();
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arizona, Dec 21 – 26 · Crew Trip</title>
+<meta name="description" content="Interactive Christmas trip plan: Boston to Phoenix, Sedona, Flagstaff and the Grand Canyon.">
+<meta name="theme-color" content="#1F1714">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav class="topbar">
-    <a href="index.html" class="brand">🌵 <span>Crew Trip</span></a>
-    <div class="topbar-actions">
-      <button class="icon-btn" id="copy-text" title="Copy plan for WhatsApp">📋 <span>Copy plan</span></button>
-      <button class="icon-btn accent" id="copy-link" title="Copy share link">🔗 <span>Share</span></button>
-      <button class="icon-btn" id="theme" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
-    </div>
-  </nav>
 
-  <header class="hero">
-    <svg class="hero-art" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-      <defs>
-        <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffe9a8" />
-          <stop offset="60%" stop-color="#ffb347" />
-          <stop offset="100%" stop-color="#ff7a45" stop-opacity="0" />
-        </radialGradient>
-      </defs>
-      <circle class="sun" cx="860" cy="210" r="120" fill="url(#sun)" />
-      <path class="mesa far" d="M0 250 L120 250 L150 205 L300 205 L330 250 L520 250 L560 190 L700 190 L735 250 L1200 250 L1200 320 L0 320Z" />
-      <path class="mesa near" d="M0 285 L210 285 L240 245 L380 245 L410 285 L780 285 L815 230 L990 230 L1025 285 L1200 285 L1200 320 L0 320Z" />
-      <g class="cactus" transform="translate(140 232)"><path d="M10 60 V8 a6 6 0 0 1 12 0 V60 Z M22 34 h8 V18 a5 5 0 0 1 10 0 V40 a6 6 0 0 1 -6 6 H22Z M10 40 H4 a6 6 0 0 1 -6 -6 V24 a5 5 0 0 1 10 0 V30 h2Z" /></g>
-      <g class="cactus" transform="translate(1060 240) scale(.8)"><path d="M10 60 V8 a6 6 0 0 1 12 0 V60 Z M22 34 h8 V18 a5 5 0 0 1 10 0 V40 a6 6 0 0 1 -6 6 H22Z M10 40 H4 a6 6 0 0 1 -6 -6 V24 a5 5 0 0 1 10 0 V30 h2Z" /></g>
-    </svg>
-    <div class="hero-inner">
-      <p class="eyebrow">Boston → Phoenix · Mon Dec 21 – Sat Dec 26</p>
-      <h1>The Crew Trip Planner</h1>
-      <p class="tagline">Desert Christmas, <em>red rocks</em> and the big canyon, in six days.</p>
-      <div class="crew" id="crew"></div>
-      <div class="countdown" id="countdown" aria-live="polite"></div>
-    </div>
-  </header>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Dec 21 – 26, 2026 · Boston → Phoenix · 6 travelers</p>
+    <h1>Red rock to <em>rim</em>, home for Christmas.</h1>
+    <p class="lede" id="lede"></p>
+    <dl class="facts" id="facts"></dl>
+  </div>
+  <div class="wrap profile">
+    <p class="prof-cap">Elevation along the route · tap a section to jump to that day</p>
+    <div id="profile"></div>
+  </div>
+</header>
 
-  <main class="layout">
-    <aside class="builder">
-      <div class="card">
-        <div class="builder-head">
-          <h2>🧭 Build the route</h2>
-          <span class="step-count" id="step-count"></span>
-        </div>
-        <div class="progress"><div class="progress-bar" id="progress"></div></div>
-        <div id="questions"></div>
-      </div>
+<nav aria-label="Jump to section"><div class="wrap navrow" id="nav"></div></nav>
 
-      <div class="card">
-        <h2>⚡ What if…</h2>
-        <p class="muted">Turn these on to see how the plan changes.</p>
-        <div class="switches">
-          <label class="switch"><input type="checkbox" id="t-snow" /><span class="track"><span class="thumb"></span></span><span>❄️ Snow or ice up north</span></label>
-          <label class="switch"><input type="checkbox" id="t-delay" /><span class="track"><span class="thumb"></span></span><span>✈️ Boston flight lands late</span></label>
-          <label class="switch"><input type="checkbox" id="t-split" /><span class="track"><span class="thumb"></span></span><span>😴 Some want to skip the road trip</span></label>
-        </div>
-      </div>
-    </aside>
+<section class="wrap setup" id="setup" aria-label="Set up the plan">
+  <h2>Set up the plan</h2>
+  <p class="sub">Every choice rewrites the days below and is saved in the link.</p>
+  <div id="controls" class="controls"></div>
+</section>
 
-    <section class="results">
-      <div class="stats" id="stats"></div>
+<main class="wrap" id="days"></main>
 
-      <div class="card">
-        <div class="card-head"><h2>🧩 The options</h2></div>
-        <p class="muted">Every option uses your current answers (landing time, snow plan, flight home). Pick one, or let the crew vote below.</p>
-        <div class="options" id="options"></div>
-      </div>
+<section class="alt" id="alt">
+  <div class="wrap">
+    <h2>The options</h2>
+    <p class="sub">Same flights, same Christmas at home, four ways to spend the days around it. Each option uses your current settings.</p>
+    <div class="altgrid" id="options"></div>
 
-      <div class="card map-card">
-        <div class="card-head">
-          <h2>🗺️ Route</h2>
-          <span class="pill" id="route-pill"></span>
-        </div>
-        <div class="map-grid">
-          <div>
-            <div class="map-wrap"><svg id="map" viewBox="0 0 300 350" role="img" aria-label="Route map of Arizona"></svg></div>
-            <p class="map-legend"><span class="lg home"></span> Home base <span class="lg on"></span> On the route <span class="lg off"></span> Not this time</p>
-          </div>
-          <div>
-            <h3 class="sub-h">⛰️ Elevation along the route</h3>
-            <p class="muted">Tap a point to jump to that day.</p>
-            <div id="elev" class="elev"></div>
-          </div>
-        </div>
-      </div>
+    <h2 class="alt-h2">If this happens</h2>
+    <p class="sub">Decide now, so nobody has to argue about it in a parking lot.</p>
+    <div class="altgrid" id="ifs"></div>
+  </div>
+</section>
 
-      <div class="card">
-        <div class="card-head"><h2>🗓️ Day by day</h2></div>
-        <ol class="timeline" id="timeline"></ol>
-      </div>
+<section class="book wrap" id="book">
+  <h2>Book before anything else</h2>
+  <p class="sub">It's Christmas week. Rooms and rental cars are the real limit, not driving time.</p>
+  <div class="progress"><i id="prog"></i></div>
+  <ul class="checks" id="checks"></ul>
+</section>
 
-      <div class="card callout">
-        <div class="card-head">
-          <h2>📌 Book before anything else</h2>
-          <span class="pill" id="check-pill"></span>
-        </div>
-        <p class="muted">It's Christmas week, so rooms and rental cars are the real limit, not driving time. Tick items off and they're saved in the share link.</p>
-        <div id="checklist" class="checklist"></div>
-      </div>
+<section class="book wrap" id="vote">
+  <h2>Crew vote</h2>
+  <p class="sub">Everyone picks an option. Votes are saved in the link, so vote, copy it, and send it on.</p>
+  <ul class="votes" id="votes"></ul>
+  <div class="tally" id="tally"></div>
+  <div class="share">
+    <p id="sharemsg">Your choices, what-ifs, delays, votes and ticked boxes are all in the page's link. Copy it and send it to the group so everyone opens the same plan.</p>
+    <button id="copy">Copy link</button>
+    <button id="copytext" class="ghost">Copy as text</button>
+  </div>
+</section>
 
-      <div class="card">
-        <div class="card-head"><h2>🔀 If this happens → we'll do this</h2></div>
-        <div id="ifs" class="ifs"></div>
-      </div>
+<footer class="wrap">
+  <p>Park fees: Grand Canyon is charged per vehicle and valid for 7 days. Most Sedona trailheads need a Red Rock Pass. An America the Beautiful pass covers both.</p>
+  <p>Arizona stays on MST, 2 hours behind Boston in December. Sunset is around 17:25 in Phoenix and 17:15 at the rim. Times are estimates with stops included, not a schedule anyone has to keep.</p>
+  <div class="links">
+    <a href="https://www.az511.gov/" target="_blank" rel="noopener">AZ511 roads</a>
+    <a href="https://www.nps.gov/grca/planyourvisit/conditions.htm" target="_blank" rel="noopener">Grand Canyon conditions</a>
+    <a href="https://forecast.weather.gov/MapClick.php?lat=35.1983&amp;lon=-111.6513" target="_blank" rel="noopener">Flagstaff forecast</a>
+    <a href="https://www.fs.usda.gov/coconino" target="_blank" rel="noopener">Coconino NF / Sedona trails</a>
+    <a href="https://www.recreation.gov/" target="_blank" rel="noopener">Recreation.gov</a>
+  </div>
+</footer>
 
-      <div class="card">
-        <div class="card-head">
-          <h2>🗳️ Crew vote</h2>
-          <span class="pill" id="vote-pill"></span>
-        </div>
-        <p class="muted">Tap a route under your name. Votes are saved in this browser and in the share link, so vote, then send the link on.</p>
-        <div class="voters" id="voters"></div>
-        <div class="tally" id="tally"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><h2>📝 Notes</h2></div>
-        <ul class="notes">
-          <li><strong>Times are estimates</strong>, not a schedule. Winter daylight is short (sunset ~5:30pm), so plan drives for daylight.</li>
-          <li><strong>Altitude:</strong> Flagstaff and the South Rim are ~7,000 ft. Expect freezing nights (often −7°C / 20°F) even when Phoenix is sunny.</li>
-          <li><strong>Time zone:</strong> Arizona (MST) is 2h behind Boston and doesn't change for daylight saving.</li>
-          <li><strong>Share link:</strong> your choices, what-ifs, votes and ticked boxes are all in the link, so everyone opens the same version.</li>
-        </ul>
-        <h3 class="sub-h">🔗 Useful links</h3>
-        <div class="links">
-          <a href="https://www.az511.gov/" target="_blank" rel="noopener">🚧 AZ511 road conditions</a>
-          <a href="https://www.nps.gov/grca/planyourvisit/conditions.htm" target="_blank" rel="noopener">🏞️ Grand Canyon conditions</a>
-          <a href="https://forecast.weather.gov/MapClick.php?lat=35.1983&lon=-111.6513" target="_blank" rel="noopener">🌨️ Flagstaff forecast (NWS)</a>
-          <a href="https://www.recreation.gov/" target="_blank" rel="noopener">🎟️ Recreation.gov passes</a>
-          <a href="https://www.fs.usda.gov/coconino" target="_blank" rel="noopener">🔴 Coconino NF (Sedona trails)</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>Drive times are rough estimates. Check <strong>az511.gov</strong> for roads and <strong>nps.gov/grca</strong> for park alerts before you go.</footer>
-  <div id="toast" class="toast" role="status"></div>
-  <canvas id="confetti" aria-hidden="true"></canvas>
-  <script src="phx.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
