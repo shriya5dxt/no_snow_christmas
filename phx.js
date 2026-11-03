@@ -15,21 +15,26 @@ const TRIP_START = new Date(2026, 11, 21, 0, 0, 0);
 
 // Map stops (lat, lon) and label side
 const PLACES = {
-  PHX: { name: "Phoenix", lat: 33.45, lon: -112.07, side: "left" },
-  SED: { name: "Sedona", lat: 34.87, lon: -111.76, side: "right" },
-  FLG: { name: "Flagstaff", lat: 35.2, lon: -111.65, side: "right" },
-  GC: { name: "Grand Canyon", lat: 36.06, lon: -112.14, side: "right" },
-  JER: { name: "Jerome", lat: 34.75, lon: -112.11, side: "left" },
-  MON: { name: "Montezuma", lat: 34.61, lon: -111.83, side: "right" },
-  TUC: { name: "Tucson", lat: 32.22, lon: -110.97, side: "right" },
-  TOM: { name: "Tombstone", lat: 31.71, lon: -110.07, side: "left" },
+  PHX: { name: "Phoenix", lat: 33.45, lon: -112.07, side: "left", elev: 1100 },
+  SED: { name: "Sedona", lat: 34.87, lon: -111.76, side: "right", elev: 4350 },
+  FLG: { name: "Flagstaff", lat: 35.2, lon: -111.65, side: "right", elev: 6900 },
+  GC: { name: "Grand Canyon", lat: 36.06, lon: -112.14, side: "right", elev: 7000 },
+  JER: { name: "Jerome", lat: 34.75, lon: -112.11, side: "left", elev: 5200 },
+  MON: { name: "Montezuma", lat: 34.61, lon: -111.83, side: "right", elev: 3200 },
+  TUC: { name: "Tucson", lat: 32.22, lon: -110.97, side: "right", elev: 2400 },
+  TOM: { name: "Tombstone", lat: 31.71, lon: -110.07, side: "left", elev: 4500 },
 };
+const SNOW_LINE = 5000;
 
 const ROUTES = {
-  loop: { icon: "🏜️", label: "Big loop, Dec 21–24", desc: "Sedona → Flagstaff → Grand Canyon, home for Christmas Eve." },
-  quick: { icon: "⚡", label: "2 days, 1 night", desc: "Grand Canyon, Sedona and Flagstaff in one overnight. The rest is downtime." },
-  day: { icon: "🚗", label: "Sedona day trip", desc: "One day of red rocks, no overnight bags." },
-  none: { icon: "🏡", label: "Stay in Phoenix", desc: "No long drives: hikes, Scottsdale, pool and food." },
+  loop: { letter: "A", icon: "🏜️", label: "Big loop, Dec 21–24", name: "The big loop", desc: "Sedona → Flagstaff → Grand Canyon, home for Christmas Eve.",
+    pro: "Most to see: sunset and sunrise at the canyon, two red-rock days.", con: "Most driving, 3 rounds of packing, highest snow exposure." },
+  quick: { letter: "B", icon: "⚡", label: "2 days, 1 night", name: "Two days, one night", desc: "Grand Canyon, Sedona and Flagstaff in one overnight. The rest is downtime.",
+    pro: "All three icons with only one night away.", con: "Two long driving days back to back." },
+  day: { letter: "C", icon: "🚗", label: "Sedona day trip", name: "Red rocks, day trip", desc: "One day of red rocks, no overnight bags.",
+    pro: "Easy: no hotels, low snow risk, lots of rest.", con: "No Grand Canyon." },
+  none: { letter: "D", icon: "🏡", label: "Stay in Phoenix", name: "Phoenix, unhurried", desc: "No long drives: hikes, Scottsdale, pool and food.",
+    pro: "Maximum rest, zero snow risk, cheapest.", con: "No red rocks or canyon." },
 };
 
 const QUESTIONS = [
@@ -115,18 +120,41 @@ const ALT = {
 };
 
 // ---------- State ----------
-const DEFAULT = { arrive: "am", route: "quick", when: "22", base: "canyon", snow: "sedona", depart: "pm", fun: ["hike", "scottsdale", "games"], t: {}, votes: {} };
-const fromLink = location.hash.length > 1;
+const DEFAULT = { arrive: "am", route: "quick", when: "22", base: "canyon", snow: "sedona", depart: "pm", fun: ["hike", "scottsdale", "games"], t: {}, votes: {}, done: [] };
+const KEYS = ["arrive", "route", "when", "base", "snow", "depart"];
+const fromLink = /(^|[#&])route=/.test(location.hash);
 let state = loadState();
 const ui = { open: fromLink ? null : "arrive", visited: new Set(fromLink ? QUESTIONS.map((q) => q.key) : ["arrive"]), firstPaint: true, prevDays: [], lastPath: "", celebrated: false };
 
+// Readable share link, e.g. #route=quick&base=canyon&if=snow&done=car,flights&vote=Bobby:loop
+function encode(s) {
+  const p = new URLSearchParams();
+  KEYS.forEach((k) => p.set(k, s[k]));
+  p.set("fun", s.fun.join(","));
+  const t = Object.keys(s.t).filter((k) => s.t[k]);
+  if (t.length) p.set("if", t.join(","));
+  if (s.done.length) p.set("done", s.done.join(","));
+  const v = Object.entries(s.votes).filter(([, r]) => r).map(([n, r]) => `${n}:${r}`);
+  if (v.length) p.set("vote", v.join(","));
+  return p.toString();
+}
+function decode(hash) {
+  const p = new URLSearchParams(hash.replace(/^#/, ""));
+  const s = { ...DEFAULT, fun: [...DEFAULT.fun], t: {}, votes: {}, done: [] };
+  KEYS.forEach((k) => { const v = p.get(k); if (v && QUESTIONS.find((q) => q.key === k).opts[v]) s[k] = v; });
+  if (p.has("fun")) s.fun = p.get("fun").split(",").filter((f) => FUN_DETAIL[f]);
+  (p.get("if") || "").split(",").filter((k) => ["snow", "delay", "split"].includes(k)).forEach((k) => (s.t[k] = true));
+  s.done = (p.get("done") || "").split(",").filter(Boolean);
+  (p.get("vote") || "").split(",").forEach((x) => { const [n, r] = x.split(":"); if (CREW.some((c) => c.name === n) && ROUTES[r]) s.votes[n] = r; });
+  return s;
+}
 function loadState() {
-  try { if (fromLink) return { ...DEFAULT, ...JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1))))) }; } catch (e) { /* bad link */ }
-  try { return { ...DEFAULT, ...JSON.parse(localStorage.getItem("crew-plan") || "{}") }; } catch (e) { return { ...DEFAULT }; }
+  if (fromLink) return decode(location.hash);
+  try { const saved = JSON.parse(localStorage.getItem("crew-plan") || "{}"); return { ...DEFAULT, ...saved, done: saved.done || [] }; } catch (e) { return { ...DEFAULT }; }
 }
 function save() {
   localStorage.setItem("crew-plan", JSON.stringify(state));
-  history.replaceState(null, "", "#" + btoa(unescape(encodeURIComponent(JSON.stringify(state)))));
+  history.replaceState(null, "", "#" + encode(state));
 }
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -254,12 +282,12 @@ function renderStats(days) {
   const hrs = days.reduce((a, d) => a + d.hrs, 0);
   const away = days.filter((d) => d.night !== "Home in PHX").length;
   const places = new Set(days.flatMap((d) => d.stops));
-  const daysTo = Math.max(0, Math.ceil((TRIP_START - new Date()) / 864e5));
+  const high = [...places].reduce((a, k) => (PLACES[k].elev > PLACES[a].elev ? k : a), "PHX");
   const tiles = [
     ["Driving", `~${Math.round(hrs * 2) / 2}<small> h</small>`, hrs ? "behind the wheel, roughly" : "only local drives"],
     ["Nights away", `${away}<small> / 5</small>`, `${5 - away} at home in PHX`],
-    ["Places", `${places.size}`, [...places].map((k) => PLACES[k].name).join(" · ")],
-    ["Countdown", `${daysTo}<small> days</small>`, "until we land in PHX"],
+    ["High point", `${PLACES[high].elev.toLocaleString()}<small> ft</small>`, PLACES[high].elev > SNOW_LINE ? `${PLACES[high].name}: snow possible ❄️` : `${PLACES[high].name}: below the snow line`],
+    ["Holiday", `Dec 24–25`, "Christmas Eve & Day at home"],
   ];
   $("stats").innerHTML = tiles.map(([l, v, s]) => `<div class="stat"><div class="label">${l}</div><div class="value">${v}</div><div class="sub">${esc(s)}</div></div>`).join("");
 }
@@ -326,7 +354,7 @@ function renderTimeline(days) {
     const xmas = d.date.includes("Christmas");
     const changed = !ui.firstPaint && ui.prevDays[i] !== keys[i];
     const home = d.night === "Home in PHX";
-    return `<li class="day ${d.away ? "away" : ""} ${xmas ? "xmas" : ""} ${changed ? "changed" : ""}" style="--i:${i}">
+    return `<li id="day-${i}" class="day ${d.away ? "away" : ""} ${xmas ? "xmas" : ""} ${changed ? "changed" : ""}" style="--i:${i}">
       <span class="dot">${xmas ? "🎄" : d.away ? "🚗" : "🏡"}</span>
       <div class="day-card">
         <div class="day-top">
@@ -381,10 +409,99 @@ function renderVotes() {
   if (total < 6) ui.celebrated = false;
 }
 
+// --- Option cards: compare every route with the current settings ---
+function summarize(days) {
+  const places = new Set(days.flatMap((d) => d.stops));
+  return {
+    hrs: Math.round(days.reduce((a, d) => a + d.hrs, 0) * 2) / 2,
+    away: days.filter((d) => d.night !== "Home in PHX").length,
+    high: Math.max(...[...places].map((k) => PLACES[k].elev)),
+    places: [...places].filter((k) => k !== "PHX").map((k) => PLACES[k].name),
+  };
+}
+function renderOptions() {
+  $("options").innerHTML = Object.entries(ROUTES).map(([k, r]) => {
+    const m = summarize(build({ ...state, route: k }).days);
+    const on = state.route === k;
+    return `<article class="option ${on ? "on" : ""}">
+      <div class="option-top"><span class="letter">Option ${r.letter}</span>${on ? `<span class="pill">✓ Current plan</span>` : ""}</div>
+      <h3>${r.icon} ${r.name}</h3>
+      <p class="option-route">${m.places.length ? esc(m.places.join(" · ")) : "Phoenix only"}</p>
+      <dl class="option-stats">
+        <div><dt>Driving</dt><dd>~${m.hrs}h</dd></div>
+        <div><dt>Nights away</dt><dd>${m.away}</dd></div>
+        <div><dt>High point</dt><dd>${m.high.toLocaleString()} ft${m.high > SNOW_LINE ? " ❄️" : ""}</dd></div>
+      </dl>
+      <p class="pro">👍 ${esc(r.pro)}</p>
+      <p class="con">👎 ${esc(r.con)}</p>
+      ${on ? "" : `<button class="btn ghost" data-pick="${k}">Choose option ${r.letter}</button>`}
+    </article>`;
+  }).join("");
+}
+
+// --- Elevation profile (single series; tap a point to jump to that day) ---
+function renderElevation(days) {
+  const pts = [];
+  days.forEach((d, di) => d.stops.forEach((k) => { if (!pts.length || pts.at(-1).k !== k) pts.push({ k, di }); }));
+  if (pts.length === 1) pts.push({ k: "PHX", di: 5 });
+  const W = 640, H = 220, L = 46, R = 16, T = 22, B = 34, MAX = 8000;
+  const x = (i) => L + (i * (W - L - R)) / (pts.length - 1);
+  const y = (ft) => T + (1 - ft / MAX) * (H - T - B);
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(PLACES[p.k].elev).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(pts.length - 1)} ${y(0)} L${x(0)} ${y(0)} Z`;
+  const grid = [0, 2000, 4000, 6000, 8000].map((ft) =>
+    `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(ft)}" y2="${y(ft)}" /><text class="axis" x="${L - 8}" y="${y(ft) + 4}" text-anchor="end">${ft ? ft / 1000 + "k" : "0"}</text>`).join("");
+  const labelled = new Set();
+  $("elev").innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Elevation along the route">
+      ${grid}
+      <line class="snowline" x1="${L}" x2="${W - R}" y1="${y(SNOW_LINE)}" y2="${y(SNOW_LINE)}" />
+      <text class="snowlabel" x="${W - R}" y="${y(SNOW_LINE) - 6}" text-anchor="end">❄️ snow possible above ~${SNOW_LINE.toLocaleString()} ft</text>
+      <path class="elev-area" d="${area}" />
+      <path class="elev-line" d="${line}" />
+      ${pts.map((p, i) => {
+        const P = PLACES[p.k], first = !labelled.has(p.k); labelled.add(p.k);
+        return `<g class="elev-pt" data-day="${p.di}" tabindex="0" role="button" aria-label="${P.name}, ${P.elev.toLocaleString()} ft, jump to ${DATES[p.di]}">
+          <title>${P.name} · ${P.elev.toLocaleString()} ft · ${DATES[p.di]}</title>
+          <circle class="hit" cx="${x(i)}" cy="${y(P.elev)}" r="16" />
+          <circle class="mark ${P.elev > SNOW_LINE ? "cold" : ""}" cx="${x(i)}" cy="${y(P.elev)}" r="5" />
+          ${first ? `<text class="pt-label" x="${x(i)}" y="${y(P.elev) - 11}" text-anchor="middle">${P.name}</text>` : ""}
+          ${i === 0 || pts[i - 1].di !== p.di ? `<text class="axis" x="${x(i)}" y="${H - 12}" text-anchor="middle">${DATES[p.di].slice(5, 11)}</text>` : ""}
+        </g>`;
+      }).join("")}
+    </svg>`;
+}
+
+// --- Booking checklist (ticks saved in the link) ---
+function checklist(days) {
+  const stops = new Set(days.flatMap((d) => d.stops));
+  const items = [
+    ["flights", "✈️ Flights BOS ⇄ PHX for all six (Dec 21 out, Dec 26 back)"],
+    ["car", "🚙 Rental at PHX: a 7-seater, or 2 cars (6 people + bags). Book early, holiday week."],
+  ];
+  days.forEach((d, i) => { if (d.night !== "Home in PHX") items.push([`stay-${d.night.split(" ")[0].toLowerCase()}-${i}`, `🛏️ Rooms in ${d.night} for ${DATES[i].split(" ·")[0]}. Holiday week sells out.`]); });
+  if (stops.has("GC")) items.push(["gc-pass", "🎟️ Grand Canyon entry, per vehicle and valid 7 days. Buy ahead at recreation.gov, or get an America the Beautiful annual pass if going with 2 cars."]);
+  if (stops.has("SED")) items.push(["redrock", "🅿️ Sedona trailhead parking: Red Rock Pass (or the America the Beautiful pass)"]);
+  if (state.t.snow && state.snow === "go" && state.route !== "none") items.push(["chains", "⛓️ Confirm AWD on the rental and pick up snow chains"]);
+  if (state.fun.includes("balloon")) items.push(["balloon", "🎈 Book the sunrise balloon ride (books up over the holidays)"]);
+  items.push(["xmas-food", "🛒 Christmas Day groceries by Dec 23–24 (most shops close early on Christmas Eve)"]);
+  return items;
+}
+function renderChecklist(days) {
+  const items = checklist(days);
+  const done = items.filter(([id]) => state.done.includes(id)).length;
+  $("check-pill").textContent = `${done}/${items.length} done`;
+  $("checklist").innerHTML = items.map(([id, label]) => `
+    <label class="check ${state.done.includes(id) ? "on" : ""}">
+      <input type="checkbox" data-done="${id}" ${state.done.includes(id) ? "checked" : ""} />
+      <span class="box"></span><span>${esc(label)}</span>
+    </label>`).join("");
+}
+
 function renderAll() {
   ["snow", "delay", "split"].forEach((k) => ($("t-" + k).checked = !!state.t[k]));
   const { days } = build(state);
-  renderCrew(); renderQuestions(); renderStats(days); renderMap(days); renderTimeline(days); renderIfs(); renderVotes();
+  renderCrew(); renderQuestions(); renderStats(days); renderOptions(); renderMap(days); renderElevation(days); renderTimeline(days); renderChecklist(days); renderIfs(); renderVotes();
   ui.firstPaint = false;
   save();
 }
@@ -464,6 +581,11 @@ document.addEventListener("click", async (e) => {
   if (head) { const k = head.dataset.step; ui.open = ui.open === k ? null : k; ui.visited.add(k); return renderAll(); }
   if (e.target.closest("[data-step-done]")) { ui.open = null; return renderAll(); }
 
+  const pick = e.target.closest("[data-pick]");
+  if (pick) { state.route = pick.dataset.pick; ui.visited.add("route"); renderAll(); return toast(`Switched to option ${ROUTES[state.route].letter} · ${ROUTES[state.route].name}`); }
+  const ep = e.target.closest(".elev-pt");
+  if (ep) return jumpToDay(ep.dataset.day);
+
   const ch = e.target.closest(".choice");
   if (ch) {
     const { voter, route } = ch.dataset;
@@ -482,7 +604,19 @@ document.addEventListener("click", async (e) => {
 
 document.addEventListener("change", (e) => {
   if (e.target.id && e.target.id.startsWith("t-")) { state.t[e.target.id.slice(2)] = e.target.checked; renderAll(); }
+  const id = e.target.dataset && e.target.dataset.done;
+  if (id) { state.done = e.target.checked ? [...new Set([...state.done, id])] : state.done.filter((x) => x !== id); renderAll(); }
 });
+document.addEventListener("keydown", (e) => {
+  const ep = e.target.closest && e.target.closest(".elev-pt");
+  if (ep && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); jumpToDay(ep.dataset.day); }
+});
+function jumpToDay(i) {
+  const el = $("day-" + i);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.remove("changed"); void el.offsetWidth; el.classList.add("changed");
+}
 
 setTheme(document.documentElement.dataset.theme || "light");
 renderAll();

@@ -42,6 +42,7 @@
     <div class="hero-inner">
       <p class="eyebrow">Boston → Phoenix · Mon Dec 21 – Sat Dec 26</p>
       <h1>The Crew Trip Planner</h1>
+      <p class="tagline">Desert Christmas, <em>red rocks</em> and the big canyon, in six days.</p>
       <div class="crew" id="crew"></div>
       <div class="countdown" id="countdown" aria-live="polite"></div>
     </div>
@@ -72,18 +73,42 @@
     <section class="results">
       <div class="stats" id="stats"></div>
 
+      <div class="card">
+        <div class="card-head"><h2>🧩 The options</h2></div>
+        <p class="muted">Every option uses your current answers (landing time, snow plan, flight home). Pick one, or let the crew vote below.</p>
+        <div class="options" id="options"></div>
+      </div>
+
       <div class="card map-card">
         <div class="card-head">
           <h2>🗺️ Route</h2>
           <span class="pill" id="route-pill"></span>
         </div>
-        <div class="map-wrap"><svg id="map" viewBox="0 0 300 350" role="img" aria-label="Route map of Arizona"></svg></div>
-        <p class="map-legend"><span class="lg home"></span> Home base <span class="lg on"></span> On the route <span class="lg off"></span> Not this time</p>
+        <div class="map-grid">
+          <div>
+            <div class="map-wrap"><svg id="map" viewBox="0 0 300 350" role="img" aria-label="Route map of Arizona"></svg></div>
+            <p class="map-legend"><span class="lg home"></span> Home base <span class="lg on"></span> On the route <span class="lg off"></span> Not this time</p>
+          </div>
+          <div>
+            <h3 class="sub-h">⛰️ Elevation along the route</h3>
+            <p class="muted">Tap a point to jump to that day.</p>
+            <div id="elev" class="elev"></div>
+          </div>
+        </div>
       </div>
 
       <div class="card">
         <div class="card-head"><h2>🗓️ Day by day</h2></div>
         <ol class="timeline" id="timeline"></ol>
+      </div>
+
+      <div class="card callout">
+        <div class="card-head">
+          <h2>📌 Book before anything else</h2>
+          <span class="pill" id="check-pill"></span>
+        </div>
+        <p class="muted">It's Christmas week, so rooms and rental cars are the real limit, not driving time. Tick items off and they're saved in the share link.</p>
+        <div id="checklist" class="checklist"></div>
       </div>
 
       <div class="card">
@@ -99,6 +124,24 @@
         <p class="muted">Tap a route under your name. Votes are saved in this browser and in the share link, so vote, then send the link on.</p>
         <div class="voters" id="voters"></div>
         <div class="tally" id="tally"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>📝 Notes</h2></div>
+        <ul class="notes">
+          <li><strong>Times are estimates</strong>, not a schedule. Winter daylight is short (sunset ~5:30pm), so plan drives for daylight.</li>
+          <li><strong>Altitude:</strong> Flagstaff and the South Rim are ~7,000 ft. Expect freezing nights (often −7°C / 20°F) even when Phoenix is sunny.</li>
+          <li><strong>Time zone:</strong> Arizona (MST) is 2h behind Boston and doesn't change for daylight saving.</li>
+          <li><strong>Share link:</strong> your choices, what-ifs, votes and ticked boxes are all in the link, so everyone opens the same version.</li>
+        </ul>
+        <h3 class="sub-h">🔗 Useful links</h3>
+        <div class="links">
+          <a href="https://www.az511.gov/" target="_blank" rel="noopener">🚧 AZ511 road conditions</a>
+          <a href="https://www.nps.gov/grca/planyourvisit/conditions.htm" target="_blank" rel="noopener">🏞️ Grand Canyon conditions</a>
+          <a href="https://forecast.weather.gov/MapClick.php?lat=35.1983&lon=-111.6513" target="_blank" rel="noopener">🌨️ Flagstaff forecast (NWS)</a>
+          <a href="https://www.recreation.gov/" target="_blank" rel="noopener">🎟️ Recreation.gov passes</a>
+          <a href="https://www.fs.usda.gov/coconino" target="_blank" rel="noopener">🔴 Coconino NF (Sedona trails)</a>
+        </div>
       </div>
     </section>
   </main>
