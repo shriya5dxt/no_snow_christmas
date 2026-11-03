@@ -1,14 +1,11 @@
 # no_snow_christmas
 
-Interactive trip planner for the crew (Apoorv, Khushbu, Sanaa, Bobby, Shriya, Archit): Boston → Phoenix, Dec 21–26.
+Interactive Arizona trip plan for the crew (Apoorv, Khushbu, Sanaa, Bobby, Shriya, Archit): Boston → Phoenix, Dec 21–26, with Christmas at home in Phoenix.
 
-## Features
-- Step-by-step route builder: big loop (Sedona → Flagstaff → Grand Canyon), 2-day/1-night, Sedona day trip, or stay in Phoenix
-- "What if" switches (snow up north, late flight, split crew) that rebuild the plan live
-- Animated Arizona route map, trip stats and a countdown
-- Day-by-day timeline with Christmas Eve/Day at home
-- Crew vote with a live tally; share link and WhatsApp copy
-- Light/dark mode
+- Seven route options: classic loop (Sedona, Flagstaff, Grand Canyon), + Monument Valley, + Page (Horseshoe Bend, Antelope Canyon), one night out, Sedona day trip, Tucson & Saguaro, stay in Phoenix
+- Timed stops for each day, "Open in Maps" links, and a "running late" shift for each day
+- What-ifs (snow up north, late flight, split crew) that rewrite the plan
+- Clickable elevation profile with the snow line
+- Booking checklist, crew vote, and a copyable link that holds every setting
 
-## Run locally
-No build step. Open `index.html` in a browser. Edit the plan data at the top of `phx.js`.
+No build step. Open `index.html`, or publish with GitHub Pages (Settings → Pages → Deploy from a branch → `main` / root).
