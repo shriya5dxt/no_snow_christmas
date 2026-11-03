@@ -45,8 +45,8 @@ const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
 const landStop = (t) => S(t, "Land at Sky Harbor", "Take the shuttle to the Rental Car Center. Six people plus bags means a 7-seater or two cars.",
   { key: 1, g: "PHX Sky Harbor Rental Car Center" });
 const sunriseRim = S(440, "Sunrise at Yavapai Point", "Sunrise is around 07:35. Wear every warm layer you brought; it's well below freezing.", { key: 1, g: "Yavapai Point, Grand Canyon AZ" });
-const desertView = S(540, "Desert View Drive", "East along the rim past Grandview and Lipan Points to the Desert View Watchtower.", { s: ["25 mi", "4 overlooks"], g: "Desert View Watchtower, AZ" });
-const cameron = S(690, "Lunch at Cameron Trading Post", "Just outside the east entrance. Get the Navajo taco, and fill the tank.", { g: "Cameron Trading Post, AZ" });
+const desertView = (t) => S(t, "Desert View Drive", "East along the rim past Grandview and Lipan Points to the Desert View Watchtower.", { s: ["25 mi", "4 overlooks"], g: "Desert View Watchtower, AZ" });
+const cameron = (t) => S(t, "Lunch at Cameron Trading Post", "Just outside the east entrance. Get the Navajo taco, and fill the tank.", { g: "Cameron Trading Post, AZ" });
 const mather = (t) => S(t, "Mather Point", "Your first look. Park at the visitor center and walk out.", { key: 1, g: "Mather Point, Grand Canyon AZ" });
 const rimTrail = (t) => S(t, "Rim Trail to Yavapai Point", "Flat and paved, the best easy walk on the rim. Yavapai Geology Museum has the big windows.", { s: ["~1.5 mi", "flat"], g: "Yavapai Geology Museum" });
 const hermit = (t) => S(t, "Hermit Road overlooks", "In winter you can drive Hermit Road yourself (it's shuttle-only the rest of the year). Stop at Powell, Hopi and Mohave Points.", { s: ["7 mi", "winter: open to cars"], g: "Hermit Road, Grand Canyon AZ" });
@@ -56,6 +56,7 @@ const redRockHike = (t) => S(t, "Cathedral Rock or Devil's Bridge", "Cathedral R
   { key: 1, s: ["1.2 mi RT · 740 ft", "or 4 mi RT · 400 ft"], g: "Cathedral Rock Trailhead, Sedona AZ" });
 const tlaq = (t) => S(t, "Lunch at Tlaquepaque", "Arts-and-crafts village under the sycamores by Oak Creek.", { g: "Tlaquepaque Arts & Shopping Village, Sedona AZ" });
 const chapel = (t) => S(t, "Chapel of the Holy Cross", "Chapel built into the rock. A 20-minute stop.", { g: "Chapel of the Holy Cross, Sedona AZ" });
+const oohAah = (t) => S(t, "Hike to Ooh Aah Point", "The first big viewpoint down the South Kaibab Trail, with the canyon opening up on both sides. The trailhead is shuttle-only: park at the visitor center and take the orange Kaibab Rim shuttle. The top switchbacks are icy in December, so wear microspikes, and allow twice as long coming back up.", { key: 1, s: ["1.8 mi RT", "~790 ft down", "1.5–2 hrs"], g: "South Kaibab Trailhead, Grand Canyon AZ" });
 const iceFlag = ["Ice on the rim", "Rim paths ice over in winter. A $20–30 pair of microspikes makes the Rim Trail much safer."];
 const altFlag = ["Altitude", "Flagstaff and the South Rim are about 7,000 ft. Expect lows well below freezing and maybe snow, so pack real jackets and gloves."];
 const RIM_NIGHT = "In-park lodges (El Tovar, Bright Angel, Maswik) are steps from the rim. Tusayan, 10 minutes outside the gate, has more beds.";
@@ -88,11 +89,21 @@ const T = {
       mather(915), hopiSunset,
       S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
 
+  phxSedonaCanyon: { nav: "Sedona → Rim", title: "Red rock morning, Grand Canyon sunset", hrs: 4.5, roads: "I-17 → SR-89A → US-180 · park fee per vehicle", night: "Grand Canyon",
+    nightNote: RIM_NIGHT, places: ["PHX", "SED", "FLG", "GC"], flags: [iceFlag], stops: [
+      S(390, "Leave Phoenix", "Out early: it's a big day, with red rock in the morning and the canyon by sunset.", { s: ["116 mi", "~2 hrs"] }),
+      redRockHike(525),
+      S(675, "Lunch at Tlaquepaque", "Quick lunch by Oak Creek before heading north.", { g: "Tlaquepaque Arts & Shopping Village, Sedona AZ" }),
+      S(750, "Up Oak Creek Canyon", "SR-89A switchbacks up to the Oak Creek Vista overlook, then through Flagstaff. If it's icy, take I-17 instead.", { key: 1, s: ["30 mi", "~50 min"], g: "Oak Creek Vista, AZ" }),
+      S(810, "North to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511.", { s: ["80 mi", "~1.5 hrs"] }),
+      mather(915), hopiSunset,
+      S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
+
   canyonDay: { nav: "Grand Canyon", title: "A full day on the South Rim", hrs: 1.5, roads: "US-180 north · park fee per vehicle", night: "Grand Canyon",
     nightNote: RIM_NIGHT, places: ["FLG", "GC"], flags: [iceFlag], stops: [
-      S(480, "Flagstaff to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511 before you leave.", { s: ["80 mi", "~1.5 hrs"] }),
-      mather(600), rimTrail(645),
-      S(780, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
+      S(450, "Flagstaff to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511 before you leave.", { s: ["80 mi", "~1.5 hrs"] }),
+      oohAah(555), mather(690), rimTrail(720),
+      S(810, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
       hermit(870), hopiSunset,
       S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
 
@@ -100,11 +111,11 @@ const T = {
     nightNote: RIM_NIGHT, places: ["PHX", "FLG", "GC"], flags: [iceFlag], stops: [
       S(360, "Leave Phoenix", "Out at 06:00 to get the most daylight on the rim.", { s: ["230 mi", "~3.75 hrs"] }),
       S(495, "Breakfast in Flagstaff", "Halfway, and the last cheap coffee."),
-      mather(630), rimTrail(675), hermit(810), hopiSunset,
+      mather(630), oohAah(675), hermit(840), hopiSunset,
       S(1110, "Dinner in Tusayan", "Simple, and 10 minutes from the gate.")] },
 
   canyonHome: { nav: "Rim → home", title: "Canyon sunrise, home for Christmas Eve", hrs: 4.5, roads: "Desert View Dr → US-89 → I-17 south", night: "Home", places: ["GC", "FLG", "PHX"], stops: [
-      sunriseRim, desertView, cameron,
+      sunriseRim, desertView(540), cameron(690),
       S(780, "Down to Phoenix", "US-89 to Flagstaff, then I-17. About 3.5 hours with a stop.", { s: ["~200 mi"] }),
       S(1020, "Home for Christmas Eve", "Unpack, shower, Christmas Eve dinner.", { key: 1 })] },
 
@@ -118,17 +129,16 @@ const T = {
 
   flagCanyonHome: { nav: "Rim → home", title: "Rim day, then down to Phoenix", hrs: 5.25, roads: "US-180 → I-17", night: "Home", places: ["FLG", "GC", "PHX"], stops: [
       S(450, "Up to the South Rim", "Through the pines past the San Francisco Peaks.", { s: ["80 mi", "~1.5 hrs"] }),
-      mather(570), rimTrail(615),
+      mather(570), oohAah(600),
       S(720, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
-      hermit(780),
-      S(870, "Head home", "Back through Flagstaff and down I-17. Home around 18:45.", { s: ["230 mi", "~3.75 hrs"] }),
-      S(1125, "Home", "", { key: 1 })] },
+      S(780, "Head home", "Back through Flagstaff and down I-17. Home around 17:30.", { s: ["230 mi", "~3.75 hrs"] }),
+      S(1050, "Home", "", { key: 1 })] },
 
   canyonToSedona: { nav: "Rim → Sedona", title: "The rim by day, Sedona by night", hrs: 6, roads: "I-17 → US-180 → I-17 → SR-179 · park fee per vehicle", night: "Sedona",
     nightNote: "West Sedona and the Village of Oak Creek are cheaper than Uptown.", places: ["PHX", "FLG", "GC", "FLG", "SED"], flags: [iceFlag], stops: [
       S(360, "Leave Phoenix", "Out at 06:00. It's a long day, so share the driving.", { s: ["230 mi", "~3.75 hrs"] }),
-      mather(600), rimTrail(645),
-      S(760, "Lunch at the rim", "Bright Angel Lodge, or the Market Plaza deli."),
+      mather(600), oohAah(630),
+      S(765, "Lunch at the rim", "Bright Angel Lodge, or the Market Plaza deli."),
       S(840, "Leave the rim", "Back to Flagstaff, then down to Sedona. After dark or in ice, take I-17 rather than 89A.", { s: ["~2.5 hrs"] }),
       S(1080, "Dinner in Sedona", "Reserve for six.")] },
 
@@ -146,10 +156,10 @@ const T = {
   canyonToMV: { nav: "Monument Valley", title: "Rim sunrise to Monument Valley sunset", hrs: 3.5, roads: "Desert View Dr → US-89 → US-160 → US-163 · Navajo Nation",
     night: "Monument Valley", nightNote: "The View Hotel is inside the park, facing the Mittens. Goulding's Lodge is just outside. Kayenta, 30 minutes back, is the cheaper fallback.",
     places: ["GC", "MV"], flags: [["Remote stretch", "Fill up at Cameron. Fuel and food are sparse until Kayenta. In December the Navajo Nation keeps the same clock as the rest of Arizona."]], stops: [
-      sunriseRim, desertView, cameron,
-      S(750, "Across the Navajo Nation", "US-160 through Tuba City and Kayenta. Wide-open Painted Desert country.", { s: ["~175 mi", "~3 hrs"] }),
-      S(930, "Monument Valley Tribal Park", "The scene from a hundred westerns. Navajo Nation entry is charged per person at the gate.", { key: 1, g: "Monument Valley Navajo Tribal Park" }),
-      S(985, "Sunset over the Mittens", "From the visitor center terrace or a hotel balcony. Sunset is around 17:10.", { key: 1, s: ["sunset ~17:10"] }),
+      sunriseRim, oohAah(495), desertView(630), cameron(735),
+      S(780, "Across the Navajo Nation", "US-160 through Tuba City and Kayenta. Wide-open Painted Desert country.", { s: ["~175 mi", "~3 hrs"] }),
+      S(960, "Monument Valley Tribal Park", "The scene from a hundred westerns. Navajo Nation entry is charged per person at the gate.", { key: 1, g: "Monument Valley Navajo Tribal Park" }),
+      S(1015, "Sunset over the Mittens", "From the visitor center terrace or a hotel balcony. Sunset is around 17:10.", { key: 1, s: ["sunset ~17:10"] }),
       S(1110, "Dinner and stars", "No towns and no light. One of the darkest skies you'll ever see.")] },
 
   mvHome: { nav: "Valley → home", title: "Valley Drive at sunrise, home for Christmas Eve", hrs: 5.75, roads: "US-163 → US-160 → US-89 → I-17", night: "Home", places: ["MV", "FLG", "PHX"],
@@ -162,8 +172,8 @@ const T = {
 
   canyonToPage: { nav: "Page", title: "Rim sunrise to Horseshoe Bend", hrs: 2.75, roads: "Desert View Dr → US-89 north", night: "Page",
     nightNote: "Page has plenty of chain hotels, much cheaper than the rim.", places: ["GC", "PAGE"], stops: [
-      sunriseRim, desertView, cameron,
-      S(750, "North on US-89", "Past the Echo Cliffs to Page on Lake Powell.", { s: ["~135 mi", "~2.25 hrs"] }),
+      sunriseRim, oohAah(495), desertView(630), cameron(735),
+      S(780, "North on US-89", "Past the Echo Cliffs to Page on Lake Powell.", { s: ["~135 mi", "~2.25 hrs"] }),
       S(930, "Horseshoe Bend", "The Colorado River curls 270° around a sandstone tower, 1,000 ft below an unfenced edge. Flat, sandy walk out, and there's a parking fee.", { key: 1, s: ["1.5 mi RT", "sunset ~17:15"], g: "Horseshoe Bend, Page AZ" }),
       S(1110, "Dinner in Page", "Casual places along Lake Powell Blvd.")] },
 
@@ -234,9 +244,9 @@ const FUN = {
 /* ---------- state + URL hash ---------- */
 const OPTS = {
   route: Object.keys(ROUTES), when: ["22", "23"], base: ["canyon", "flagstaff", "sedona"],
-  arrive: ["am", "pm"], depart: ["am", "pm", "red"], snow: ["go", "sedona", "south"],
+  snow: ["go", "sedona", "south"],
 };
-const DEFAULT = { route: "loop", when: "22", base: "canyon", arrive: "am", depart: "pm", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
+const DEFAULT = { route: "loop", when: "22", base: "canyon", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
 let state = JSON.parse(JSON.stringify(DEFAULT));
 
 function readHash() {
@@ -246,7 +256,7 @@ function readHash() {
     const p = new URLSearchParams(h);
     Object.keys(OPTS).forEach((k) => { const v = p.get(k); if (v && OPTS[k].includes(v)) state[k] = v; });
     if (p.has("fun")) state.fun = p.get("fun").split(",").filter((f) => FUN[f]);
-    (p.get("if") || "").split(",").filter((k) => ["snow", "late", "split"].includes(k)).forEach((k) => (state.t[k] = true));
+    (p.get("if") || "").split(",").filter((k) => ["snow", "split"].includes(k)).forEach((k) => (state.t[k] = true));
     (p.get("shift") || "").split(",").filter(Boolean).forEach((s) => { const [d, m] = s.split(":"); const n = parseInt(m, 10); if (d >= 0 && d < 6 && n) state.shift[d] = n; });
     state.done = (p.get("done") || "").split(",").filter(Boolean);
     (p.get("vote") || "").split(",").forEach((x) => { const [n, r] = x.split(":"); if (CREW.includes(n) && ROUTES[r]) state.votes[n] = r; });
@@ -272,22 +282,27 @@ const label = (i) => `${DATES[i][0]} ${DATES[i][1]}`;
 
 /* ---------- build the six days ---------- */
 function build(s) {
-  const late = s.arrive === "pm" || !!s.t.late;
   const days = DATES.map(() => ({ nav: "Phoenix", title: "Phoenix downtime", hrs: 0, roads: "", night: "Home", nightNote: "", places: ["PHX"], stops: [], flags: [], away: false, free: 2, min: 0, max: 1440 }));
 
-  // Day 1: arrival
-  const d0 = days[0];
-  d0.nav = "Arrive";
-  if (s.t.late) { d0.title = "A late landing"; d0.stops.push(S(1290, "Land late at Sky Harbor", "Delayed flight. Grab the car and some food, and get some sleep.", { key: 1, g: "PHX Sky Harbor Rental Car Center" })); d0.free = 0; }
-  else if (late) { d0.title = "Land and settle in"; d0.stops.push(landStop(1110), S(1200, "Late dinner near home", "Something easy. Big days ahead.")); d0.free = 0; }
-  else { d0.title = "Land, first taste of the desert"; d0.stops.push(landStop(660), S(780, "Settle in at home", "Unpack, groceries for the week, and a nap if anyone took the red-eye.")); d0.free = 1; d0.min = 840; }
+  // Dec 21 and Dec 26 are travel days only
+  Object.assign(days[0], { nav: "Fly in", title: "Travel day: Boston to Phoenix", roads: "BOS → PHX", free: 0, stops: [
+    S(0, "Fly Boston → Phoenix", "About 5.5 hours nonstop. Arizona is 2 hours behind Boston, so you gain two hours today.", { key: 1 }),
+    S(1, "Land at Sky Harbor, pick up the car", "Take the shuttle to the Rental Car Center. Six people plus bags means a 7-seater or two cars.", { g: "PHX Sky Harbor Rental Car Center" }),
+    S(2, "Groceries and dinner near home", "Stock up for the week, then an easy dinner and an early night."),
+  ], flags: [["Travel only", "No plans today beyond getting everyone in. If a flight is delayed, nothing else moves."]] });
+  Object.assign(days[5], { nav: "Fly home", title: "Travel day: Phoenix to Boston", roads: "PHX → BOS", free: 0, stops: [
+    S(0, "Pack up and tidy the house", ""),
+    S(1, "Return the car", "Drop it at the Rental Car Center and take the shuttle. Allow 2 hours before the flight.", { key: 1, g: "PHX Sky Harbor Rental Car Center" }),
+    S(2, "Fly Phoenix → Boston", "About 4.5 hours nonstop, and you lose the two hours back.", { key: 1 }),
+  ] });
+  days[0].untimed = days[5].untimed = true;
 
-  // Road trip
+  // Road trip: always inside Dec 22–24
   let seq = [], start = 1;
   const w = s.when === "23" ? 2 : 1;
-  if (s.route === "loop") { seq = late ? [T.sedonaToFlag(true), T.canyonDay, T.canyonHome] : [T.arriveSedona, T.sedonaToFlag(false), T.canyonDay, T.canyonHome]; start = late ? 1 : 0; }
-  if (s.route === "grand") { seq = late ? [T.canyonFromPhx, T.canyonToMV, T.mvHome] : [T.arriveSedona, T.sedonaToCanyon, T.canyonToMV, T.mvHome]; start = late ? 1 : 0; }
-  if (s.route === "page") { seq = late ? [T.canyonFromPhx, T.canyonToPage, T.pageHome] : [T.arriveSedona, T.sedonaToCanyon, T.canyonToPage, T.pageHome]; start = late ? 1 : 0; }
+  if (s.route === "loop") seq = [T.sedonaToFlag(true), T.canyonDay, T.canyonHome];
+  if (s.route === "grand") seq = [T.phxSedonaCanyon, T.canyonToMV, T.mvHome];
+  if (s.route === "page") seq = [T.phxSedonaCanyon, T.canyonToPage, T.pageHome];
   if (s.route === "quick") { seq = { canyon: [T.canyonFromPhx, T.canyonViaSedonaHome], flagstaff: [T.sedonaToFlag(true), T.flagCanyonHome], sedona: [T.canyonToSedona, T.sedonaHome] }[s.base]; start = w; }
   if (s.route === "day") { seq = [T.sedonaDay]; start = w; }
   if (s.route === "south") { seq = [T.tucson1, T.tucsonHome]; start = w; }
@@ -300,9 +315,6 @@ function build(s) {
 
   seq.forEach((tpl, i) => {
     const idx = start + i, d = clone(tpl);
-    if (idx === 0) { // the trip starts at the airport
-      d.stops = [landStop(660), ...d.stops.filter((x) => !/^(Leave Phoenix|Down I-10)/.test(x.h) && x.h !== "Land at Sky Harbor")];
-    }
     Object.assign(days[idx], d, { away: true, free: 0, flags: d.flags || [] });
     if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "AWD or chains, check AZ511 before every drive, and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.snow && s.route === "day") days[idx].flags.push(["Snow forecast", "Sedona sits around 4,300 ft and usually stays clear. If I-17 is bad, swap this for a Phoenix day."]);
@@ -329,13 +341,6 @@ function build(s) {
     S(930, "Out in the sun", "About 19°C / 66°F. A walk, the pool or lawn games."), S(1170, "Movie night", ""));
   xmas.flags.push(["Christmas Day", "Most restaurants and attractions are closed. Plan to eat at home."]);
 
-  // Departure
-  const dep = days[5];
-  Object.assign(dep, { nav: "Fly home", title: "Fly home to Boston" });
-  if (s.depart === "am") { dep.free = 0; dep.stops.push(S(480, "Return the car, fly home", "Allow 2 hours: drop the rental at the Rental Car Center, then take the shuttle.", { key: 1 })); }
-  if (s.depart === "pm") { dep.free = 1; dep.max = 720; dep.stops.push(S(600, "Brunch", ""), S(810, "Return the car, fly home", "Allow 2 hours before the flight.", { key: 1 })); }
-  if (s.depart === "red") { dep.free = 2; dep.max = 1020; dep.stops.push(S(1080, "Farewell dinner", "", { key: 1 }), S(1230, "Return the car, fly home", "Evening or red-eye.", { key: 1 })); }
-
   // Fill Phoenix free time with the crew's picks
   const pool = [...s.fun];
   days.forEach((d) => {
@@ -361,8 +366,7 @@ function contingencies(s) {
   }
   if (s.route === "grand") out.push(["If the Valley Drive is muddy", "Go guided", "The dirt loop gets slick after rain or snow. Take a Navajo-guided jeep tour, or watch from the visitor center terrace."]);
   if (s.route === "page") out.push(["If Antelope tours are cancelled", "Lower, or the dam", "Tours close for flash-flood risk. Try Lower Antelope or Antelope Canyon X, or the Glen Canyon Dam overlook."]);
-  out.push(["If the Dec 21 flight is late", ["loop", "grand", "page"].includes(s.route) ? "Start a day later" : "Nothing changes",
-    ["loop", "grand", "page"].includes(s.route) ? "Sleep in Phoenix. The trip starts Dec 22 with an early drive, and you're still home for Christmas Eve. Use the 'Flight lands late' switch to see that version." : "The road trip doesn't start until later in the week."]);
+  out.push(["If a flight is delayed", "Nothing moves", "Dec 21 and Dec 26 are travel days only, so a late landing or a late departure doesn't touch the plan."]);
   out.push(["If some want to rest", "Split the crew", "Two cars: one group does the drive, the other stays on the Phoenix plan. Everyone meets for Christmas Eve."]);
   out.push(["If it rains in Phoenix", "Go indoors", "Musical Instrument Museum, Heard Museum, or Scottsdale Fashion Square."]);
   return out;
@@ -377,6 +381,7 @@ function checklist(days) {
   const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them.",
     "Monument Valley": "The View and Goulding's are the only beds near the park, and they sell out.", Page: "Plenty of hotels, but book with the tour.", Tucson: "Lots of choice." };
   days.forEach((d, i) => { if (d.night !== "Home") items.push([`stay-${d.night.toLowerCase().replace(/\W+/g, "")}-${i}`, `Rooms in ${d.night}, ${label(i)}, for six`, why[d.night] || ""]); });
+  if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
   if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. With two cars, an America the Beautiful pass may work out cheaper."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
   if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 24 morning", "Navajo-guided tours only, and they sell out weeks ahead."]);
@@ -476,10 +481,8 @@ function renderControls() {
   ];
   if (["quick", "day", "south"].includes(state.route)) rows.push(["Which days", "", seg("when", [["22", "Tue 22 – Wed 23"], ["23", "Wed 23 – Thu 24"]])]);
   if (state.route === "quick") rows.push(["Sleep in", "The one night out", seg("base", [["canyon", "Grand Canyon"], ["flagstaff", "Flagstaff"], ["sedona", "Sedona"]])]);
-  rows.push(["Land Dec 21", "", seg("arrive", [["am", "Morning"], ["pm", "Evening"]])]);
-  rows.push(["Fly home Dec 26", "", seg("depart", [["am", "Morning"], ["pm", "Afternoon"], ["red", "Evening"]])]);
   if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Stay low · Sedona"], ["south", "Go south · Tucson"]])]);
-  rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["late", "Flight lands late"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
+  rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   rows.push(["Phoenix downtime", "Fills the free time at home", seg("fun", Object.entries(FUN).map(([k, f]) => [k, f.short]), { multi: true, get: (v) => state.fun.includes(v) })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
 }
@@ -490,7 +493,7 @@ function renderDays(days) {
     const meta = [d.hrs ? `<b>~${d.hrs} hrs driving</b>` : `<b>${d.away ? "short drives" : "at home"}</b>`, d.roads].filter(Boolean).join(" · ");
     const stops = d.stops.map((s) => {
       const t = s.t + sh;
-      return `<li class="stop${s.key ? " key" : ""}"><span class="time${t >= 1260 ? " late" : ""}">${fmt(t)}</span><h3>${esc(s.h)}</h3>${s.p ? `<p>${esc(s.p)}</p>` : ""}
+      return `<li class="stop${s.key ? " key" : ""}">${d.untimed ? "" : `<span class="time${t >= 1260 ? " late" : ""}">${fmt(t)}</span>`}<h3>${esc(s.h)}</h3>${s.p ? `<p>${esc(s.p)}</p>` : ""}
         ${(s.s || []).map((x) => `<span class="stat">${esc(x)}</span>`).join("")}
         ${s.g ? `<a class="gm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.g)}" target="_blank" rel="noopener">Open in Maps ↗</a>` : ""}</li>`;
     }).join("");
@@ -499,7 +502,7 @@ function renderDays(days) {
     return `<section class="day" id="d${i}" style="--zone:${zoneOf(d, i)}">
       <div class="dayhead"><span class="daynum">${label(i)}</span>${i === 3 ? `<span class="tag">Christmas Eve</span>` : i === 4 ? `<span class="tag">Christmas</span>` : ""}<h2>${esc(d.title)}</h2></div>
       <p class="daymeta">${meta}</p>
-      <div class="ctrls"><div class="shift"><span>Running late</span><button data-shift="${i}" data-by="-15" aria-label="15 minutes earlier">−</button><span class="val">${sh > 0 ? "+" : ""}${sh}m</span><button data-shift="${i}" data-by="15" aria-label="15 minutes later">+</button></div></div>
+      ${d.untimed ? "" : `<div class="ctrls"><div class="shift"><span>Running late</span><button data-shift="${i}" data-by="-15" aria-label="15 minutes earlier">−</button><span class="val">${sh > 0 ? "+" : ""}${sh}m</span><button data-shift="${i}" data-by="15" aria-label="15 minutes later">+</button></div></div>`}
       <ul class="stops">${stops}</ul>${night}${flags}</section>`;
   }).join("");
 
@@ -566,7 +569,7 @@ function jump(i) {
 function planText() {
   const days = build(state), r = ROUTES[state.route];
   return `Arizona crew trip · Dec 21–26\nOption ${r.letter}: ${r.name}\n\n` +
-    days.map((d, i) => `${label(i)}: ${d.title}\n` + d.stops.map((s) => `  ${fmt(s.t + (state.shift[i] || 0))}  ${s.h}`).join("\n") + (i < 5 ? `\n  Night: ${d.night === "Home" ? "home in Phoenix" : d.night}` : "")).join("\n\n") +
+    days.map((d, i) => `${label(i)}: ${d.title}\n` + d.stops.map((s) => `  ${d.untimed ? "•" : fmt(s.t + (state.shift[i] || 0))}  ${s.h}`).join("\n") + (i < 5 ? `\n  Night: ${d.night === "Home" ? "home in Phoenix" : d.night}` : "")).join("\n\n") +
     `\n\nPlan, options & vote: ${location.href}`;
 }
 
