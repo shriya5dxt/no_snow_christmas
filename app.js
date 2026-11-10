@@ -19,9 +19,23 @@ const PLACES = {
 };
 const SNOW_LINE = 5000;
 
+// Typical late-December highs/lows (°F), rounded from NOAA/NPS normals. Not a forecast.
+const WX = {
+  GC: { hi: 41, lo: 18, note: "Real winter on the rim. Snow and wind are common, and sunrise often feels like 5°F (−15°C) with wind chill." },
+  FLG: { hi: 43, lo: 17, note: "Real winter. Snow is common, and nights are well below freezing." },
+  JER: { hi: 50, lo: 32, note: "A hillside town: windier and a little colder than Sedona." },
+  SED: { hi: 56, lo: 31, note: "Sunny, mild afternoons and frosty mornings. Snow is rare and usually gone by noon." },
+  MON: { hi: 59, lo: 28, note: "Mild days, cold nights." },
+  SUP: { hi: 65, lo: 42, note: "Like Phoenix, but it cools quickly once the sun drops behind the mountains." },
+  SALT: { hi: 66, lo: 44, note: "Like Phoenix, and cooler by the river at dusk." },
+  PHX: { hi: 67, lo: 46, note: "Sunny and dry. Mornings and evenings are jacket weather." },
+};
+const toC = (f) => Math.round(((f - 32) * 5) / 9);
+const temp = (f) => `${f}°F (${toC(f)}°C)`;
+
 /* ---------- stop helper ---------- */
 const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
-const NORTH = Object.keys({ rim: 1, rimsedona: 1, flag: 1, sedonanight: 1 }); // routes that climb above the snow line
+const NORTH = ["rim", "rimsedona", "flag"]; // routes that climb above the snow line
 
 // The Dec 23–24 road trip (both days off for everyone)
 const ROUTES = {
@@ -34,9 +48,6 @@ const ROUTES = {
   flag: { letter: "C", short: "Sedona → Flagstaff → Canyon", name: "Red rock first, canyon second", head: "Sedona, a night in Flagstaff, then the rim",
     desc: "Dec 23: a Sedona hike, Oak Creek Canyon, and a night in downtown Flagstaff. Christmas Eve: Ooh Aah Point and the rim, home by about 17:30.",
     best: "All three places and the cheapest beds. No sunset or sunrise at the canyon." },
-  sedonanight: { letter: "D", short: "Canyon → Sedona night", name: "Canyon first, a night in Sedona", head: "The rim by day, wake up in red rock",
-    desc: "Dec 23: straight to the rim for Ooh Aah Point, then down to Sedona for the night. Christmas Eve: red rock hike and Airport Mesa sunset, home by about 19:15.",
-    best: "Wake up in Sedona. The longest Dec 23." },
 };
 
 // Dec 22: everyone is free from 3 pm Central = 2 pm Arizona
@@ -134,6 +145,11 @@ const T = {
       airportMesa,
       S(1035, "Drive home", "Down I-17.", { s: ["116 mi", "~2 hrs"] })] },
 
+  sedonaSnowDay: { nav: "Sedona", title: "Plan B: a Sedona day trip", hrs: 4, roads: "I-17 ⇄ SR-179", night: "Home", places: ["PHX", "SED", "PHX"], stops: [
+      S(480, "Leave Phoenix", "No dawn start needed. Sedona sits below most of the snow.", { s: ["116 mi", "~2 hrs"] }),
+      S(615, "Bell Rock Pathway", "Wide, easy trail around Bell Rock and Courthouse Butte. Sedona at its least icy.", { key: 1, s: ["3.6 mi loop", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
+      tlaq(750), chapel(840), airportMesa,
+      S(1035, "Drive home", "Down I-17.", { s: ["~2 hrs"] })] },
   sedA1: { nav: "Sedona", title: "Plan B: red rocks, low and clear", hrs: 2, roads: "I-17 north", night: "Sedona", places: ["PHX", "SED"], stops: [
       S(600, "Leave Phoenix", "No rush. Sedona sits below most of the snow.", { s: ["116 mi", "~2 hrs"] }),
       S(750, "Bell Rock Pathway", "Wide, easy trail around Bell Rock and Courthouse Butte. Sedona at its least icy.", { key: 1, s: ["3.6 mi loop", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
@@ -234,9 +250,8 @@ function build(s) {
   if (s.route === "rim") seq = [T.canyonFromPhx, T.canyonHome];
   if (s.route === "rimsedona") seq = [T.canyonFromPhx, T.canyonViaSedonaHome];
   if (s.route === "flag") seq = [T.sedonaToFlag(true), T.flagCanyonHome];
-  if (s.route === "sedonanight") seq = [T.canyonToSedona, T.sedonaHome];
   const snowAlt = s.t.snow && s.snow !== "go" && NORTH.includes(s.route);
-  if (snowAlt) seq = [T.sedA1, T.sedHome];
+  if (snowAlt) seq = [T.sedonaSnowDay];
 
   seq.forEach((tpl, i) => {
     const idx = 2 + i, d = clone(tpl);
@@ -244,7 +259,7 @@ function build(s) {
     if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "Check AZ511 before every drive and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.split) days[idx].flags.push(["Split crew", "Part of the crew takes this trip, the rest stay in Phoenix on the downtime plan. Meet back up for Christmas Eve."]);
   });
-  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version stays in Sedona, below most of it."]);
+  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version swaps the canyon for a Sedona day trip, below most of it, and keeps Christmas Eve in Phoenix."]);
 
   // Christmas Eve
   const eve = days[3];
@@ -259,7 +274,7 @@ function build(s) {
 
   // Christmas Day
   const xmas = days[4];
-  const sawSedona = ["rimsedona", "flag", "sedonanight"].includes(s.route) || snowAlt;
+  const sawSedona = ["rimsedona", "flag"].includes(s.route) || snowAlt;
   Object.assign(xmas, { nav: "Christmas", title: "Christmas at home", free: 0 });
   if (s.xmas === "sedona") {
     Object.assign(xmas, { nav: "Christmas · Sedona", title: "Christmas morning in Sedona, home by 2 pm", hrs: 4, roads: "I-17 ⇄ SR-179", places: ["PHX", "SED", "PHX"] });
@@ -272,6 +287,7 @@ function build(s) {
       S(900, "Christmas lunch, late", "The big meal of the trip.", { key: 1 }),
       S(1020, "Gifts", ""), S(1170, "Movie night", ""));
     xmas.flags.push(["Christmas morning in Sedona", "Trails and viewpoints are open, but most cafés and shops are closed, so bring food. Most trailhead lots need a Red Rock Pass."]);
+    xmas.flags.push(["Frosty start", "Expect around 31°F (−1°C) at the trailhead at 08:15, warming to the mid-50s by noon. Frost makes Cathedral Rock's slickrock slippery. If it's white or wet, walk the Bell Rock Pathway instead."]);
     if (sawSedona) xmas.flags.push(["Sedona twice?", "This plan already passes through Sedona, so a local hike might make a better Christmas morning."]);
   } else {
     if (s.xmas === "hike") xmas.stops.push(S(450, "Christmas-morning hike", "Piestewa Peak, or the gentler Gateway Loop in the McDowell Sonoran Preserve. Trails are empty today.", { g: "Gateway Trailhead, Scottsdale AZ" }));
@@ -297,9 +313,9 @@ function build(s) {
 function contingencies(s) {
   const out = [];
   if (NORTH.includes(s.route)) {
-    out.push(["If it snows up north", { go: "Go carefully", sedona: "Stay low in Sedona" }[s.snow],
+    out.push(["If it snows up north", { go: "Go carefully", sedona: "Sedona day trip instead" }[s.snow],
       { go: "Check AZ511 and the Grand Canyon NPS alerts each morning, drive in daylight, and skip any closed road.",
-        sedona: "Swap the canyon for Sedona and the Verde Valley, below most of the snow." }[s.snow]]);
+        sedona: "Skip the canyon. Do Sedona as a day trip (about 4,300 ft, usually clear) and spend Christmas Eve in Phoenix." }[s.snow]]);
     out.push(["If a road closes mid-trip", "Stay put", "I-17, I-40, US-180 and AZ-64 all close for storms now and then. Stay where you are and wait for AZ511 to clear it. Avoid 89A through Oak Creek Canyon in ice."]);
   }
   out.push(["If work runs late on Dec 22", "Stay close", "Swap to the Botanical Garden and Hole-in-the-Rock, 15 minutes away, and still catch the sunset."]);
@@ -317,6 +333,7 @@ function checklist(days) {
   ];
   const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them." };
   days.forEach((d, i) => { if (d.night !== "Home") items.push([`stay-${d.night.toLowerCase().replace(/\W+/g, "")}-${i}`, `Rooms in ${d.night}, ${label(i)}, for six`, why[d.night] || ""]); });
+  if (pl.has("GC") || pl.has("FLG")) items.push(["layers", "Warm layers for everyone", "An insulated or down jacket, hat, gloves and wool socks. The rim at sunrise is often around 18°F (−8°C) before wind chill, and hand warmers help."]);
   if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
   if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. Buy ahead at recreation.gov or pay at the gate."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
@@ -415,7 +432,7 @@ function renderControls() {
   ];
   rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
   rows.push(["Christmas morning", "Back by 2–3 pm", seg("xmas", Object.entries(XMAS))]);
-  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Stay low · Sedona"]])]);
+  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona day trip instead"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
 }
@@ -435,13 +452,27 @@ function renderDays(days) {
     return `<section class="day" id="d${i}" style="--zone:${zoneOf(d, i)}">
       <div class="dayhead"><span class="daynum">${label(i)}</span>${i === 3 ? `<span class="tag">Christmas Eve</span>` : i === 4 ? `<span class="tag">Christmas</span>` : ""}<h2>${esc(d.title)}</h2></div>
       <p class="daymeta">${meta}</p>
+      ${wxLine(d, i)}
       ${d.untimed ? "" : `<div class="ctrls"><div class="shift"><span>Running late</span><button data-shift="${i}" data-by="-15" aria-label="15 minutes earlier">−</button><span class="val">${sh > 0 ? "+" : ""}${sh}m</span><button data-shift="${i}" data-by="15" aria-label="15 minutes later">+</button></div></div>`}
       <ul class="stops">${stops}</ul>${night}${flags}</section>`;
   }).join("");
 
   $("nav").innerHTML = days.map((d, i) => `<a href="#d${i}">${DATES[i][0]} · ${esc(d.nav)}</a>`).join("") +
-    `<a href="#alt">Options</a><a href="#book">Book now</a><a href="#vote">Vote</a>`;
+    `<a href="#weather">Weather</a><a href="#alt">Options</a><a href="#book">Book now</a><a href="#vote">Vote</a>`;
   markNav();
+}
+
+// typical weather for a day: the coldest place you'll be, plus Phoenix if you also pass through it
+function wxLine(d, i) {
+  if (i === 0 || i === 5) return `<p class="wx">Typical in Phoenix · high ${temp(WX.PHX.hi)} · low ${temp(WX.PHX.lo)}</p>`;
+  const pl = [...new Set(d.places)].sort((a, b) => PLACES[b].elev - PLACES[a].elev).slice(0, 2);
+  return `<p class="wx">Typical · ${pl.map((k) => `${PLACES[k].name} high ${temp(WX[k].hi)}, low ${temp(WX[k].lo)}`).join(" · ")}</p>`;
+}
+
+function renderWeather(days) {
+  const pl = [...new Set(days.flatMap((d) => d.places))].sort((a, b) => PLACES[b].elev - PLACES[a].elev);
+  $("wxtable").innerHTML = `<thead><tr><th>Place</th><th>Elevation</th><th>Typical high</th><th>Typical low</th><th>What to expect</th></tr></thead><tbody>` +
+    pl.map((k) => `<tr class="${PLACES[k].elev > SNOW_LINE ? "cold" : ""}"><td>${esc(PLACES[k].name)}</td><td>${PLACES[k].elev.toLocaleString()} ft</td><td>${temp(WX[k].hi)}</td><td>${temp(WX[k].lo)}</td><td>${esc(WX[k].note)}</td></tr>`).join("") + `</tbody>`;
 }
 
 function renderAlt() {
@@ -478,7 +509,7 @@ function renderVotes() {
 
 function render() {
   const days = build(state);
-  renderHero(days); renderProfile(days); renderControls(); renderDays(days); renderAlt(); renderChecks(days); renderVotes();
+  renderHero(days); renderProfile(days); renderControls(); renderDays(days); renderWeather(days); renderAlt(); renderChecks(days); renderVotes();
   writeHash();
 }
 
@@ -489,7 +520,7 @@ function markNav() {
   observer = new IntersectionObserver((entries) => entries.forEach((e) => {
     if (e.isIntersecting) links.forEach((l) => l.classList.toggle("on", l.getAttribute("href") === "#" + e.target.id));
   }), { rootMargin: "-45% 0px -50% 0px" });
-  ["d0", "d1", "d2", "d3", "d4", "d5", "alt", "book", "vote"].forEach((id) => { const el = $(id); if (el) observer.observe(el); });
+  ["d0", "d1", "d2", "d3", "d4", "d5", "weather", "alt", "book", "vote"].forEach((id) => { const el = $(id); if (el) observer.observe(el); });
 }
 
 function jump(i) {

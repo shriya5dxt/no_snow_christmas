@@ -119,6 +119,23 @@ main { padding: 56px 22px 0; }
 .night { margin-top: 18px; padding: 12px 16px; background: var(--paper-2); border-radius: 4px; font-size: .92rem; }
 .night b { font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 2px; }
 
+/* weather */
+.wx { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); margin: -10px 0 16px; letter-spacing: .03em; }
+.wx::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--high); margin-right: 8px; vertical-align: 1px; }
+.wxwrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 5px; }
+.wxt { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.wxt th { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; text-align: left; padding: 10px 14px; background: var(--paper-2); }
+.wxt td { padding: 10px 14px; border-top: 1px solid var(--rule); vertical-align: top; }
+.wxt td:nth-child(2), .wxt td:nth-child(3), .wxt td:nth-child(4) { font-family: "IBM Plex Mono", monospace; font-size: 12px; white-space: nowrap; }
+.wxt td:first-child { font-weight: 600; white-space: nowrap; }
+.wxt td:last-child { color: var(--muted); min-width: 240px; }
+.wxt tr.cold td:first-child { color: var(--high); }
+.wxgrid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 22px; }
+.wxcard { border: 1px solid var(--rule); border-radius: 5px; padding: 14px 16px; background: var(--paper); }
+.wxcard b { display: block; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--high); margin-bottom: 6px; }
+.wxcard ul { margin: 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 4px; }
+.wxcard strong { font-weight: 600; }
+
 /* alternatives */
 .alt { background: var(--night); color: var(--paper); padding: 46px 0; margin-top: 44px; scroll-margin-top: 50px; }
 .alt .sub { color: #B5A598; }
