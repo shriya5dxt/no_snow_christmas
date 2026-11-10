@@ -297,7 +297,9 @@ function build(s) {
   // Christmas Day
   const xmas = days[4];
   Object.assign(xmas, { nav: "Christmas", title: "Christmas at home: games and food", free: 0, untimed: true });
-  xmas.stops.push(S(0, "Games and food", "It's all planned, so just bring your appetite and your competitive side.", { key: 1 }));
+  xmas.stops.push(
+    S(0, "Christmas brunch out", "Good coffee and a late-morning brunch, maybe chole bhature. A lot of places close or keep short hours on Christmas Day (many Indian restaurants stay open), so call ahead and book for six.", { key: 1 }),
+    S(1, "Games and food at home", "It's all planned, so just bring your appetite and your competitive side.", { key: 1 }));
 
 
   // Fill Phoenix free time with the crew's picks
@@ -344,6 +346,7 @@ function checklist(days) {
   if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A and along parts of the rim."]);
   if (state.fun.includes("balloon")) items.push(["balloon", "Sunrise balloon ride", "Holiday weeks book up. Pick an early date to leave a backup day."]);
   if (state.fun.includes("scottsdale")) items.push(["scottsdale", "Scottsdale dinner reservation for six", "Old Town gets busy over the holidays."]);
+  items.push(["xmas-brunch", "Christmas brunch for six", "Find a café or an Indian spot (chole bhature) that's open on Dec 25, and book. Holiday hours are short."]);
   items.push(["groceries", "Christmas groceries by the 24th", "Most shops close early on Christmas Eve and stay shut on Christmas Day."]);
   return items;
 }
