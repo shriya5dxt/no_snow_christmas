@@ -296,7 +296,7 @@ function build(s) {
 
   // Christmas Day
   const xmas = days[4];
-  Object.assign(xmas, { nav: "Christmas", title: "Christmas at home: games and food", free: 0, untimed: true });
+  Object.assign(xmas, { nav: "Christmas", title: "Christmas: brunch out, then games and food at home", free: 0, untimed: true });
   xmas.stops.push(
     S(0, "Christmas brunch out", "Good coffee and a late-morning brunch, maybe chole bhature. A lot of places close or keep short hours on Christmas Day (many Indian restaurants stay open), so call ahead and book for six.", { key: 1 }),
     S(1, "Games and food at home", "It's all planned, so just bring your appetite and your competitive side.", { key: 1 }));
