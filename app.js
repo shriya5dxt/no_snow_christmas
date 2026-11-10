@@ -12,12 +12,8 @@ const PLACES = {
   SED: { name: "Sedona", elev: 4350 },
   FLG: { name: "Flagstaff", elev: 6900 },
   GC: { name: "Grand Canyon", elev: 7000 },
-  MV: { name: "Monument Valley", elev: 5560 },
-  PAGE: { name: "Page", elev: 4300 },
   JER: { name: "Jerome", elev: 5200 },
   MON: { name: "Verde Valley", elev: 3200 },
-  TUC: { name: "Tucson", elev: 2400 },
-  TOM: { name: "Tombstone", elev: 4500 },
   SUP: { name: "Superstitions", elev: 2000 },
   SALT: { name: "Salt River", elev: 1500 },
 };
@@ -25,7 +21,7 @@ const SNOW_LINE = 5000;
 
 /* ---------- stop helper ---------- */
 const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
-const NORTH = ["rim", "rimsedona", "rimpage"]; // routes that climb above the snow line
+const NORTH = Object.keys({ rim: 1, rimsedona: 1, flag: 1, sedonanight: 1 }); // routes that climb above the snow line
 
 // The Dec 23–24 road trip (both days off for everyone)
 const ROUTES = {
@@ -35,13 +31,12 @@ const ROUTES = {
   rimsedona: { letter: "B", short: "Canyon + Sedona", name: "Canyon, home via Sedona", head: "Come back down Oak Creek Canyon",
     desc: "Same Dec 23. On Christmas Eve, back through Flagstaff and down Oak Creek Canyon for a Sedona sunset, home by about 19:15.",
     best: "Sees Sedona without using Christmas morning." },
-  rimpage: { letter: "C", short: "Canyon + Horseshoe Bend", name: "Canyon and Page", head: "North to Horseshoe Bend on Christmas Eve",
-    desc: "Same Dec 23. On Christmas Eve, rim sunrise, then north to Horseshoe Bend and an Antelope Canyon tour, home around 18:45.",
-    best: "The most iconic photos. Also the longest Christmas Eve drive, about 7 hours." },
-  tucson: { letter: "D", short: "Tucson", name: "Saguaro country", head: "Tucson & Saguaro National Park",
-    desc: "Giant saguaros, a painted 18th-century mission and Sonoran food. Low and warm, so snow-proof.", best: "The backup if the forecast up north looks bad." },
-  home: { letter: "E", short: "Stay put", name: "Phoenix, unhurried", head: "No overnight trip",
-    desc: "Sunrise hikes, Scottsdale, pool days and good food, all from home.", best: "Maximum rest, zero snow risk." },
+  flag: { letter: "C", short: "Sedona → Flagstaff → Canyon", name: "Red rock first, canyon second", head: "Sedona, a night in Flagstaff, then the rim",
+    desc: "Dec 23: a Sedona hike, Oak Creek Canyon, and a night in downtown Flagstaff. Christmas Eve: Ooh Aah Point and the rim, home by about 17:30.",
+    best: "All three places and the cheapest beds. No sunset or sunrise at the canyon." },
+  sedonanight: { letter: "D", short: "Canyon → Sedona night", name: "Canyon first, a night in Sedona", head: "The rim by day, wake up in red rock",
+    desc: "Dec 23: straight to the rim for Ooh Aah Point, then down to Sedona for the night. Christmas Eve: red rock hike and Airport Mesa sunset, home by about 19:15.",
+    best: "Wake up in Sedona. The longest Dec 23." },
 };
 
 // Dec 22: everyone is free from 3 pm Central = 2 pm Arizona
@@ -68,7 +63,6 @@ const D22 = {
 
 // Christmas morning
 const XMAS = { sedona: "Sedona, back by 2 pm", hike: "Local hike", slow: "Slow morning at home" };
-
 
 const sunriseRim = S(440, "Sunrise at Yavapai Point", "Sunrise is around 07:35. Wear every warm layer you brought; it's well below freezing.", { key: 1, g: "Yavapai Point, Grand Canyon AZ" });
 const desertView = (t) => S(t, "Desert View Drive", "East along the rim past Grandview and Lipan Points to the Desert View Watchtower.", { s: ["25 mi", "4 overlooks"], g: "Desert View Watchtower, AZ" });
@@ -98,33 +92,6 @@ const T = {
       redRockHike(fromPhx ? 570 : 480), tlaq(735), chapel(840),
       S(930, "Oak Creek Canyon to Flagstaff", "SR-89A climbs 2,500 ft up a narrow canyon of switchbacks to the Oak Creek Vista overlook. If it's icy, take I-17 instead.", { key: 1, s: ["30 mi", "~50 min"], g: "Oak Creek Vista, AZ" }),
       S(1110, "Dinner in downtown Flagstaff", "A Route 66 brewery town, so it's easy to find a table for six. Lowell Observatory runs telescope nights; check its holiday schedule.", { g: "Downtown Flagstaff, AZ" })] }),
-
-  sedonaToCanyon: { nav: "Sedona → Rim", title: "Red rock morning, Grand Canyon sunset", hrs: 3, roads: "SR-89A → US-180 · park fee per vehicle", night: "Grand Canyon",
-    nightNote: RIM_NIGHT, places: ["SED", "FLG", "GC"], flags: [iceFlag], stops: [
-      redRockHike(480),
-      S(690, "Up Oak Creek Canyon", "SR-89A switchbacks up to the Oak Creek Vista overlook. If it's icy, take I-17 instead.", { s: ["30 mi", "~50 min"], g: "Oak Creek Vista, AZ" }),
-      S(750, "Lunch in Flagstaff", "Quick stop downtown before the last stretch north."),
-      S(810, "North to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511.", { s: ["80 mi", "~1.5 hrs"] }),
-      mather(915), hopiSunset,
-      S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
-
-  phxSedonaCanyon: { nav: "Sedona → Rim", title: "Red rock morning, Grand Canyon sunset", hrs: 4.5, roads: "I-17 → SR-89A → US-180 · park fee per vehicle", night: "Grand Canyon",
-    nightNote: RIM_NIGHT, places: ["PHX", "SED", "FLG", "GC"], flags: [iceFlag], stops: [
-      S(390, "Leave Phoenix", "Out early: it's a big day, with red rock in the morning and the canyon by sunset.", { s: ["116 mi", "~2 hrs"] }),
-      redRockHike(525),
-      S(675, "Lunch at Tlaquepaque", "Quick lunch by Oak Creek before heading north.", { g: "Tlaquepaque Arts & Shopping Village, Sedona AZ" }),
-      S(750, "Up Oak Creek Canyon", "SR-89A switchbacks up to the Oak Creek Vista overlook, then through Flagstaff. If it's icy, take I-17 instead.", { key: 1, s: ["30 mi", "~50 min"], g: "Oak Creek Vista, AZ" }),
-      S(810, "North to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511.", { s: ["80 mi", "~1.5 hrs"] }),
-      mather(915), hopiSunset,
-      S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
-
-  canyonDay: { nav: "Grand Canyon", title: "A full day on the South Rim", hrs: 1.5, roads: "US-180 north · park fee per vehicle", night: "Grand Canyon",
-    nightNote: RIM_NIGHT, places: ["FLG", "GC"], flags: [iceFlag], stops: [
-      S(450, "Flagstaff to the South Rim", "Through ponderosa forest past the San Francisco Peaks. This road gets snow, so check AZ511 before you leave.", { s: ["80 mi", "~1.5 hrs"] }),
-      oohAah(555), mather(690), rimTrail(720),
-      S(810, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
-      hermit(870), hopiSunset,
-      S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
 
   canyonFromPhx: { nav: "Grand Canyon", title: "Straight up to the Grand Canyon", hrs: 3.75, roads: "I-17 → US-180 · park fee per vehicle", night: "Grand Canyon",
     nightNote: RIM_NIGHT, places: ["PHX", "FLG", "GC"], flags: [iceFlag], stops: [
@@ -167,73 +134,6 @@ const T = {
       airportMesa,
       S(1035, "Drive home", "Down I-17.", { s: ["116 mi", "~2 hrs"] })] },
 
-  sedonaDay: { nav: "Sedona", title: "Red rock day trip", hrs: 4, roads: "I-17 ⇄ SR-179", night: "Home", places: ["PHX", "SED", "PHX"], stops: [
-      S(420, "Leave Phoenix", "Out early for morning light on the rocks.", { s: ["116 mi", "~2 hrs"] }),
-      redRockHike(570), tlaq(735), chapel(840), airportMesa,
-      S(1035, "Drive home", "Down I-17 in the dark. Swap drivers.", { s: ["~2 hrs"] })] },
-
-  canyonToMV: { nav: "Monument Valley", title: "Rim sunrise to Monument Valley sunset", hrs: 3.5, roads: "Desert View Dr → US-89 → US-160 → US-163 · Navajo Nation",
-    night: "Monument Valley", nightNote: "The View Hotel is inside the park, facing the Mittens. Goulding's Lodge is just outside. Kayenta, 30 minutes back, is the cheaper fallback.",
-    places: ["GC", "MV"], flags: [["Remote stretch", "Fill up at Cameron. Fuel and food are sparse until Kayenta. In December the Navajo Nation keeps the same clock as the rest of Arizona."]], stops: [
-      sunriseRim, oohAah(495), desertView(630), cameron(735),
-      S(780, "Across the Navajo Nation", "US-160 through Tuba City and Kayenta. Wide-open Painted Desert country.", { s: ["~175 mi", "~3 hrs"] }),
-      S(960, "Monument Valley Tribal Park", "The scene from a hundred westerns. Navajo Nation entry is charged per person at the gate.", { key: 1, g: "Monument Valley Navajo Tribal Park" }),
-      S(1015, "Sunset over the Mittens", "From the visitor center terrace or a hotel balcony. Sunset is around 17:10.", { key: 1, s: ["sunset ~17:10"] }),
-      S(1110, "Dinner and stars", "No towns and no light. One of the darkest skies you'll ever see.")] },
-
-  mvHome: { nav: "Valley → home", title: "Valley Drive at sunrise, home for Christmas Eve", hrs: 5.75, roads: "US-163 → US-160 → US-89 → I-17", night: "Home", places: ["MV", "FLG", "PHX"],
-    flags: [["Long day on Christmas Eve", "About 5.5 hours of driving plus the Valley Drive. Leave by 12:30 to be home around 18:30. The Tribal Park closes on Christmas Day, which doesn't affect this plan."]], stops: [
-      S(450, "Sunrise over the buttes", "The Mittens light up first. Step outside the hotel.", { key: 1 }),
-      S(510, "17-mile Valley Drive", "Unpaved loop among the buttes. It's fine slowly in a normal car when dry. After rain or snow, take a Navajo-guided jeep tour instead.", { key: 1, s: ["17 mi", "~2 hrs", "dirt"], g: "Monument Valley Scenic Drive" }),
-      S(660, "Forrest Gump Point (optional)", "The straight-road photo on US-163, a short detour north into Utah.", { s: ["~50 min round trip"], g: "Forrest Gump Point, UT" }),
-      S(750, "The long drive home", "Kayenta, Tuba City, Flagstaff, then I-17. Swap drivers every 90 minutes.", { s: ["~330 mi", "~5.5 hrs"] }),
-      S(1095, "Home for Christmas Eve", "Late dinner at home.", { key: 1 })] },
-
-  canyonToPage: { nav: "Page", title: "Rim sunrise to Horseshoe Bend", hrs: 2.75, roads: "Desert View Dr → US-89 north", night: "Page",
-    nightNote: "Page has plenty of chain hotels, much cheaper than the rim.", places: ["GC", "PAGE"], stops: [
-      sunriseRim, oohAah(495), desertView(630), cameron(735),
-      S(780, "North on US-89", "Past the Echo Cliffs to Page on Lake Powell.", { s: ["~135 mi", "~2.25 hrs"] }),
-      S(930, "Horseshoe Bend", "The Colorado River curls 270° around a sandstone tower, 1,000 ft below an unfenced edge. Flat, sandy walk out, and there's a parking fee.", { key: 1, s: ["1.5 mi RT", "sunset ~17:15"], g: "Horseshoe Bend, Page AZ" }),
-      S(1110, "Dinner in Page", "Casual places along Lake Powell Blvd.")] },
-
-  pageHome: { nav: "Page → home", title: "Antelope Canyon, home for Christmas Eve", hrs: 4.75, roads: "US-89 → I-17", night: "Home", places: ["PAGE", "FLG", "PHX"],
-    flags: [["Tour times", "Antelope Canyon tours run in fixed slots and sell out. If Christmas Eve hours are short, book the first slot, or move the tour to Dec 23 afternoon."]], stops: [
-      S(570, "Antelope Canyon tour", "A slot canyon of curving sandstone, by Navajo-guided tour only. Upper is flat and easy; Lower has ladders and smaller crowds.", { key: 1, s: ["~1.5 hrs", "guided only"], g: "Upper Antelope Canyon, AZ" }),
-      S(705, "Lunch in Page", "Fuel up too."),
-      S(765, "Drive home", "US-89 south past the Painted Desert to Flagstaff, then I-17.", { s: ["~275 mi", "~4.5 hrs"] }),
-      S(1050, "Home for Christmas Eve", "", { key: 1 })] },
-
-  canyonPageHome: { nav: "Rim → Page → home", title: "Rim sunrise, Horseshoe Bend, home for Christmas Eve", hrs: 7, roads: "Desert View Dr → US-89 north → US-89 south → I-17", night: "Home", places: ["GC", "PAGE", "FLG", "PHX"],
-    flags: [["Long day on Christmas Eve", "About 7 hours of driving. Book the earliest Antelope Canyon slot you can get after 11:30, and leave Page by 14:00."]], stops: [
-      sunriseRim,
-      S(510, "North to Page", "Out the east entrance, past Cameron and the Echo Cliffs.", { s: ["~140 mi", "~2.5 hrs"] }),
-      S(675, "Horseshoe Bend", "The Colorado River curls 270° around a sandstone tower, 1,000 ft below an unfenced edge. Flat, sandy walk out, and there's a parking fee.", { key: 1, s: ["1.5 mi RT"], g: "Horseshoe Bend, Page AZ" }),
-      S(750, "Antelope Canyon tour", "A slot canyon of curving sandstone, by Navajo-guided tour only. Midday light is the best in the slot. Check whether tours run on Christmas Eve.", { key: 1, s: ["~1.5 hrs", "guided only"], g: "Upper Antelope Canyon, AZ" }),
-      S(840, "Drive home", "US-89 south past the Painted Desert to Flagstaff, then I-17.", { s: ["~275 mi", "~4.5 hrs"] }),
-      S(1125, "Home for Christmas Eve", "Late dinner at home.", { key: 1 })] },
-
-  tucson1: { nav: "Tucson", title: "Saguaro country", hrs: 2, roads: "I-10 east", night: "Tucson", nightNote: "Plenty of choice downtown or near the university.", places: ["PHX", "TUC"], stops: [
-      S(540, "Down I-10 to Tucson", "Flat desert highway, with Picacho Peak halfway.", { s: ["115 mi", "~1h45"] }),
-      S(690, "Arizona-Sonora Desert Museum", "Mostly outdoors: part zoo, part botanical garden, and the best introduction to the Sonoran Desert.", { key: 1, s: ["~2 mi of paths", "~3 hrs"], g: "Arizona-Sonora Desert Museum" }),
-      S(900, "Saguaro National Park West", "Bajada Loop Drive, through the thickest saguaro forest anywhere.", { s: ["6 mi dirt loop"], g: "Saguaro National Park West" }),
-      S(1000, "Sunset at Gates Pass", "The classic Tucson sunset over the saguaros.", { key: 1, g: "Gates Pass, Tucson AZ" }),
-      S(1110, "Dinner downtown", "Tucson is a UNESCO City of Gastronomy. Go for Sonoran-style Mexican food.")] },
-  tucson2: { nav: "Tucson", title: "Missions and cactus forests", hrs: 0.5, roads: "Around Tucson", night: "Tucson", places: ["TUC"], stops: [
-      S(540, "Mission San Xavier del Bac", "An 18th-century mission, still active, with an extraordinary painted interior.", { key: 1, g: "Mission San Xavier del Bac" }),
-      S(690, "Sonoran hot dogs", "Bacon-wrapped, with beans, on a bolillo bun. El Güero Canelo is the classic.", { g: "El Guero Canelo, Tucson AZ" }),
-      S(780, "Saguaro National Park East", "Cactus Forest Loop Drive, then the short Freeman Homestead trail.", { s: ["8 mi loop"], g: "Saguaro National Park East" }),
-      S(1110, "Dinner on 4th Avenue", "")] },
-  tombstone: { nav: "Tombstone", title: "An Old West day", hrs: 2.5, roads: "I-10 → AZ-80", night: "Tucson", places: ["TUC", "TOM", "TUC"], stops: [
-      S(540, "Tombstone", "A bit of a theme park, but fun for a group: boardwalks, saloons, the O.K. Corral.", { s: ["70 mi", "~1h15"], g: "Tombstone, AZ" }),
-      S(840, "Or: Kartchner Caverns", "A living limestone cave on guided tours only, so book ahead.", { g: "Kartchner Caverns State Park" }),
-      S(1110, "Dinner back in Tucson", "")] },
-  tucsonHome: { nav: "Tucson → home", title: "The White Dove, home by dusk", hrs: 2, roads: "I-10 west", night: "Home", places: ["TUC", "PHX"], stops: [
-      S(540, "Mission San Xavier del Bac", "An 18th-century mission, still active, with an extraordinary painted interior.", { key: 1, g: "Mission San Xavier del Bac" }),
-      S(690, "Sonoran hot dogs", "Bacon-wrapped, with beans, on a bolillo bun. El Güero Canelo is the classic.", { g: "El Guero Canelo, Tucson AZ" }),
-      S(780, "Saguaro National Park East", "Cactus Forest Loop Drive.", { s: ["8 mi loop"], g: "Saguaro National Park East" }),
-      S(930, "Drive home", "Back up I-10.", { s: ["~1h45"] }),
-      S(1050, "Home", "", { key: 1 })] },
-
   sedA1: { nav: "Sedona", title: "Plan B: red rocks, low and clear", hrs: 2, roads: "I-17 north", night: "Sedona", places: ["PHX", "SED"], stops: [
       S(600, "Leave Phoenix", "No rush. Sedona sits below most of the snow.", { s: ["116 mi", "~2 hrs"] }),
       S(750, "Bell Rock Pathway", "Wide, easy trail around Bell Rock and Courthouse Butte. Sedona at its least icy.", { key: 1, s: ["3.6 mi loop", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
@@ -254,7 +154,6 @@ const T = {
       S(660, "Montezuma Castle on the way", "Right off I-17, if you didn't make it yet.", { g: "Montezuma Castle National Monument" }),
       S(840, "Home", "", { key: 1 })] },
 };
-const SNOW_ALT = { sedona: [T.sedA1, T.sedA2, T.sedA3, T.sedHome], south: [T.tucson1, T.tucson2, T.tombstone, T.tucsonHome] };
 
 /* ---------- Phoenix downtime picks ---------- */
 const FUN = {
@@ -270,7 +169,7 @@ const FUN = {
 };
 
 /* ---------- state + URL hash ---------- */
-const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), xmas: Object.keys(XMAS), snow: ["go", "sedona", "south"] };
+const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), xmas: Object.keys(XMAS), snow: ["go", "sedona"] };
 const DEFAULT = { route: "rim", d22: "dutchman", xmas: "sedona", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
 let state = JSON.parse(JSON.stringify(DEFAULT));
 
@@ -334,10 +233,10 @@ function build(s) {
   let seq = [];
   if (s.route === "rim") seq = [T.canyonFromPhx, T.canyonHome];
   if (s.route === "rimsedona") seq = [T.canyonFromPhx, T.canyonViaSedonaHome];
-  if (s.route === "rimpage") seq = [T.canyonFromPhx, T.canyonPageHome];
-  if (s.route === "tucson") seq = [T.tucson1, T.tucsonHome];
+  if (s.route === "flag") seq = [T.sedonaToFlag(true), T.flagCanyonHome];
+  if (s.route === "sedonanight") seq = [T.canyonToSedona, T.sedonaHome];
   const snowAlt = s.t.snow && s.snow !== "go" && NORTH.includes(s.route);
-  if (snowAlt) seq = s.snow === "sedona" ? [T.sedA1, T.sedHome] : [T.tucson1, T.tucsonHome];
+  if (snowAlt) seq = [T.sedA1, T.sedHome];
 
   seq.forEach((tpl, i) => {
     const idx = 2 + i, d = clone(tpl);
@@ -345,8 +244,7 @@ function build(s) {
     if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "Check AZ511 before every drive and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.split) days[idx].flags.push(["Split crew", "Part of the crew takes this trip, the rest stay in Phoenix on the downtime plan. Meet back up for Christmas Eve."]);
   });
-  if (snowAlt) days[2].flags.unshift(["Plan B is on", s.snow === "sedona" ? "Snow is forecast up north, so this version stays in Sedona, below most of it." : "Snow is forecast up north, so this version heads south to Tucson instead."]);
-  if (s.route === "home") days[2].free = 2;
+  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version stays in Sedona, below most of it."]);
 
   // Christmas Eve
   const eve = days[3];
@@ -361,7 +259,7 @@ function build(s) {
 
   // Christmas Day
   const xmas = days[4];
-  const sawSedona = s.route === "rimsedona" || (snowAlt && s.snow === "sedona");
+  const sawSedona = ["rimsedona", "flag", "sedonanight"].includes(s.route) || snowAlt;
   Object.assign(xmas, { nav: "Christmas", title: "Christmas at home", free: 0 });
   if (s.xmas === "sedona") {
     Object.assign(xmas, { nav: "Christmas · Sedona", title: "Christmas morning in Sedona, home by 2 pm", hrs: 4, roads: "I-17 ⇄ SR-179", places: ["PHX", "SED", "PHX"] });
@@ -399,13 +297,11 @@ function build(s) {
 function contingencies(s) {
   const out = [];
   if (NORTH.includes(s.route)) {
-    out.push(["If it snows up north", { go: "Go carefully", sedona: "Stay low in Sedona", south: "Head south to Tucson" }[s.snow],
+    out.push(["If it snows up north", { go: "Go carefully", sedona: "Stay low in Sedona" }[s.snow],
       { go: "Check AZ511 and the Grand Canyon NPS alerts each morning, drive in daylight, and skip any closed road.",
-        sedona: "Swap the high country for Sedona, Jerome and the Verde Valley, all below most of the snow.",
-        south: "Swap the high country for Tucson, Saguaro National Park and Tombstone, warm and low." }[s.snow]]);
+        sedona: "Swap the canyon for Sedona and the Verde Valley, below most of the snow." }[s.snow]]);
     out.push(["If a road closes mid-trip", "Stay put", "I-17, I-40, US-180 and AZ-64 all close for storms now and then. Stay where you are and wait for AZ511 to clear it. Avoid 89A through Oak Creek Canyon in ice."]);
   }
-  if (s.route === "rimpage") out.push(["If Antelope tours are cancelled", "Lower, or the dam", "Tours close for flash-flood risk. Try Lower Antelope or Antelope Canyon X, or the Glen Canyon Dam overlook."]);
   out.push(["If work runs late on Dec 22", "Stay close", "Swap to the Botanical Garden and Hole-in-the-Rock, 15 minutes away, and still catch the sunset."]);
   if (s.xmas === "sedona") out.push(["If Christmas morning feels too early", "Hike locally", "After two days on the road, a 6 am start may be too much. Swap Sedona for a local hike and keep the whole day at home."]);
   out.push(["If a flight is delayed", "Nothing moves", "Dec 21 and Dec 26 are travel days only, so a late landing or a late departure doesn't touch the plan."]);
@@ -419,15 +315,13 @@ function checklist(days) {
   const items = [
     ["flights", "Flights BOS → PHX Dec 21, PHX → BOS Dec 26, all six", "Holiday-week fares climb fast."],
   ];
-  const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them.",
-    "Monument Valley": "The View and Goulding's are the only beds near the park, and they sell out.", Page: "Plenty of hotels, but book with the tour.", Tucson: "Lots of choice." };
+  const why = { Sedona: "Pricey, so book early.", Flagstaff: "The most choice and the cheapest beds up north.", "Grand Canyon": "Closest beds to the rim, and not many of them." };
   days.forEach((d, i) => { if (d.night !== "Home") items.push([`stay-${d.night.toLowerCase().replace(/\W+/g, "")}-${i}`, `Rooms in ${d.night}, ${label(i)}, for six`, why[d.night] || ""]); });
   if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
   if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. Buy ahead at recreation.gov or pay at the gate."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
-  if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 24 around midday", "Navajo-guided tours only, and they sell out weeks ahead. Confirm they run on Christmas Eve."]);
   if (pl.has("SALT")) items.push(["tonto", "Tonto Pass for Coon Bluff / Saguaro Lake parking", "Day pass per vehicle. Buy online or at a local gas station before you go."]);
-  if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A, on the Navajo Nation and along parts of the rim."]);
+  if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A and along parts of the rim."]);
   if (state.fun.includes("balloon")) items.push(["balloon", "Sunrise balloon ride", "Holiday weeks book up. Pick an early date to leave a backup day."]);
   if (state.fun.includes("scottsdale")) items.push(["scottsdale", "Scottsdale dinner reservation for six", "Old Town gets busy over the holidays."]);
   items.push(["groceries", "Christmas groceries by the 24th", "Most shops close early on Christmas Eve and stay shut on Christmas Day."]);
@@ -521,9 +415,8 @@ function renderControls() {
   ];
   rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
   rows.push(["Christmas morning", "Back by 2–3 pm", seg("xmas", Object.entries(XMAS))]);
-  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Stay low · Sedona"], ["south", "Go south · Tucson"]])]);
+  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Stay low · Sedona"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
-  if (state.route === "home") rows.push(["Phoenix downtime", "Fills Dec 23–24 at home", seg("fun", Object.entries(FUN).map(([k, f]) => [k, f.short]), { multi: true, get: (v) => state.fun.includes(v) })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
 }
 
