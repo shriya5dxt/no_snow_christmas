@@ -69,8 +69,6 @@ const D22 = {
     S(1110, "Dinner in Old Town", "Reserve for six.", { key: 1 })] },
 };
 
-// Christmas morning
-const XMAS = { sedona: "Sedona, back by 2 pm", hike: "Local hike", slow: "Slow morning at home" };
 
 const sunriseRim = S(440, "Sunrise at Yavapai Point", "Sunrise is around 07:35. Wear every warm layer you brought; it's well below freezing.", { key: 1, g: "Yavapai Point, Grand Canyon AZ" });
 const desertView = (t) => S(t, "Desert View Drive", "East along the rim past Grandview and Lipan Points to the Desert View Watchtower.", { s: ["25 mi", "4 overlooks"], g: "Desert View Watchtower, AZ" });
@@ -211,8 +209,8 @@ const FUN = {
 };
 
 /* ---------- state + URL hash ---------- */
-const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), xmas: Object.keys(XMAS), snow: ["go", "sedona"] };
-const DEFAULT = { route: "twosun", d22: "dutchman", xmas: "slow", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
+const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), snow: ["go", "sedona"] };
+const DEFAULT = { route: "twosun", d22: "dutchman", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
 let state = JSON.parse(JSON.stringify(DEFAULT));
 
 function readHash() {
@@ -298,27 +296,9 @@ function build(s) {
 
   // Christmas Day
   const xmas = days[4];
-  const sawSedona = true; // every plan now has Sedona on Dec 23
-  Object.assign(xmas, { nav: "Christmas", title: "Christmas at home", free: 0 });
-  if (s.xmas === "sedona") {
-    Object.assign(xmas, { nav: "Christmas · Sedona", title: "Christmas morning in Sedona, home by 2 pm", hrs: 4, roads: "I-17 ⇄ SR-179", places: ["PHX", "SED", "PHX"] });
-    xmas.stops.push(
-      S(360, "Leave for Sedona", "Empty Christmas-morning roads up I-17. Pack breakfast and coffee, because most of Sedona is closed today.", { s: ["116 mi", "~2 hrs"] }),
-      redRockHike(495),
-      S(645, "Red Rock Scenic Byway", "SR-179 past Bell Rock and Courthouse Butte on the way out, with pullouts for photos.", { g: "Red Rock Scenic Byway, Sedona AZ" }),
-      S(705, "Head home", "Back down I-17.", { s: ["~2 hrs"] }),
-      S(825, "Home", "", { key: 1 }),
-      S(900, "Christmas lunch, late", "The big meal of the trip.", { key: 1 }),
-      S(1020, "Gifts", ""), S(1170, "Movie night", ""));
-    xmas.flags.push(["Christmas morning in Sedona", "Trails and viewpoints are open, but most cafés and shops are closed, so bring food. Most trailhead lots need a Red Rock Pass."]);
-    xmas.flags.push(["Frosty start", "Expect around 31°F (−1°C) at the trailhead at 08:15, warming to the mid-50s by noon. Frost makes Cathedral Rock's slickrock slippery. If it's white or wet, walk the Bell Rock Pathway instead."]);
-    if (sawSedona) xmas.flags.push(["Sedona twice?", "You'll already have had a Sedona sunset, so a local hike or a slow morning might make a better Christmas."]);
-  } else {
-    if (s.xmas === "hike") xmas.stops.push(S(450, "Christmas-morning hike", "Piestewa Peak, or the gentler Gateway Loop in the McDowell Sonoran Preserve. Trails are empty today.", { g: "Gateway Trailhead, Scottsdale AZ" }));
-    xmas.stops.push(S(600, "Gifts and a slow breakfast", "", { key: 1 }), S(810, "Christmas lunch", "The big meal of the trip.", { key: 1 }),
-      S(930, "Out in the sun", "About 19°C / 66°F. A walk, the pool or lawn games."), S(1170, "Movie night", ""));
-  }
-  xmas.flags.push(["Christmas Day", "Most restaurants and attractions are closed. Plan to eat at home."]);
+  Object.assign(xmas, { nav: "Christmas", title: "Christmas at home: games and food", free: 0, untimed: true });
+  xmas.stops.push(S(0, "Games and food", "It's all planned, so just bring your appetite and your competitive side.", { key: 1 }));
+
 
   // Fill Phoenix free time with the crew's picks
   const pool = [...s.fun];
@@ -343,7 +323,6 @@ function contingencies(s) {
     out.push(["If a road closes mid-trip", "Stay put", "I-17, I-40, US-180 and AZ-64 all close for storms now and then. Stay where you are and wait for AZ511 to clear it. Avoid 89A through Oak Creek Canyon in ice."]);
   }
   out.push(["If work runs late on Dec 22", "Stay close", "Swap to the Botanical Garden and Hole-in-the-Rock, 15 minutes away, and still catch the sunset."]);
-  if (s.xmas === "sedona") out.push(["If Christmas morning feels too early", "Hike locally", "After two days on the road, a 6 am start may be too much. Swap Sedona for a local hike and keep the whole day at home."]);
   out.push(["If a flight is delayed", "Nothing moves", "Dec 21 and Dec 26 are travel days only, so a late landing or a late departure doesn't touch the plan."]);
   out.push(["If some want to rest", "Split the crew", "One group does the drive, the other stays on the Phoenix plan. Everyone meets for Christmas Eve."]);
   out.push(["If it rains in Phoenix", "Go indoors", "Musical Instrument Museum, Heard Museum, or Scottsdale Fashion Square."]);
@@ -455,7 +434,6 @@ function renderControls() {
     ["Dec 23–24 trip", "Which sunset comes first. Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
   ];
   rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
-  rows.push(["Christmas morning", "Back by 2–3 pm", seg("xmas", Object.entries(XMAS))]);
   if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona only, home that night"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
