@@ -35,19 +35,16 @@ const temp = (f) => `${f}°F (${toC(f)}°C)`;
 
 /* ---------- stop helper ---------- */
 const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
-const NORTH = ["rim", "rimsedona", "flag"]; // routes that climb above the snow line
+const NORTH = ["twosun", "sedfirst"]; // routes that climb above the snow line
 
 // The Dec 23–24 road trip (both days off for everyone)
 const ROUTES = {
-  rim: { letter: "A", short: "Grand Canyon", name: "The Grand Canyon", head: "Ooh Aah Point, rim sunset, rim sunrise",
-    desc: "Up through Flagstaff on Dec 23 for Ooh Aah Point, Hermit Road and sunset at Hopi Point. Sunrise and Desert View Drive on Christmas Eve, home by about 17:00.",
-    best: "The plan as it stands, with the easiest Christmas Eve." },
-  rimsedona: { letter: "B", short: "Canyon + Sedona", name: "Canyon, home via Sedona", head: "Come back down Oak Creek Canyon",
-    desc: "Same Dec 23. On Christmas Eve, back through Flagstaff and down Oak Creek Canyon for a Sedona sunset, home by about 19:15.",
-    best: "Sees Sedona without using Christmas morning." },
-  flag: { letter: "C", short: "Sedona → Flagstaff → Canyon", name: "Red rock first, canyon second", head: "Sedona, a night in Flagstaff, then the rim",
-    desc: "Dec 23: a Sedona hike, Oak Creek Canyon, and a night in downtown Flagstaff. Christmas Eve: Ooh Aah Point and the rim, home by about 17:30.",
-    best: "All three places and the cheapest beds. No sunset or sunrise at the canyon." },
+  twosun: { letter: "A", short: "Canyon sunset, then Sedona sunset", name: "Two sunsets", head: "Grand Canyon sunset Dec 23, Sedona sunset Dec 24",
+    desc: "Dec 23: up through Flagstaff for Ooh Aah Point, Hermit Road and sunset at Hopi Point, and a night at the canyon. Dec 24: rim sunrise, down Oak Creek Canyon to Sedona, sunset at Airport Mesa, home around 19:15.",
+    best: "Both sunsets plus a canyon sunrise, and home for Christmas Eve dinner." },
+  sedfirst: { letter: "B", short: "Sedona sunset, then canyon sunset", name: "Two sunsets, reversed", head: "Sedona sunset Dec 23, Grand Canyon sunset Dec 24",
+    desc: "Dec 23: an easy start, red rock all afternoon, sunset at Airport Mesa, then a night in Flagstaff. Dec 24: a full day on the rim with Ooh Aah Point and sunset at Hopi Point, home around 21:15.",
+    best: "A slower first morning, but a late Christmas Eve and a dark drive home." },
 };
 
 // Dec 22: everyone is free from 3 pm Central = 2 pm Arizona
@@ -94,6 +91,32 @@ const RIM_NIGHT = "In-park lodges (El Tovar, Bright Angel, Maswik) are steps fro
 
 /* ---------- day templates ---------- */
 const T = {
+  sedonaSunsetToFlag: { nav: "Sedona → Flagstaff", title: "Red rock afternoon, Sedona sunset", hrs: 3.25, roads: "I-17 north → SR-179 · I-17 to Flagstaff after dark", night: "Flagstaff",
+    nightNote: "Downtown Flagstaff is walkable, has the most beds, and is 1.5 hours from the rim.", places: ["PHX", "SED", "FLG"],
+    flags: [["After dark", "Take SR-179 and I-17 up to Flagstaff, not the 89A switchbacks through Oak Creek Canyon, which can ice up at night."], altFlag], stops: [
+      S(510, "Leave Phoenix", "No dawn start: Sedona is two hours up I-17, and the light gets good in the afternoon.", { s: ["116 mi", "~2 hrs"] }),
+      S(645, "Bell Rock Pathway", "An easy walk on the way into town, with big views of Bell Rock and Courthouse Butte for little effort.", { s: ["~2 mi", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
+      tlaq(750),
+      S(825, "Cathedral Rock", "Short and steep, with hands-on slickrock to a saddle between the spires. If it's frosty or wet, skip it, because the rock gets slippery.", { key: 1, s: ["1.2 mi RT", "740 ft"], g: "Cathedral Rock Trailhead, Sedona AZ" }),
+      chapel(930), airportMesa,
+      S(1080, "Dinner in Sedona", "Eat before you drive on. Reserve for six."),
+      S(1170, "Drive to Flagstaff", "Up I-17 to 7,000 ft. Expect it to be below freezing when you arrive.", { s: ["~50 mi", "~1h15"] })] },
+  sedonaSunsetHome: { nav: "Sedona", title: "Plan B: red rock afternoon, Sedona sunset, home", hrs: 4, roads: "I-17 ⇄ SR-179", night: "Home", places: ["PHX", "SED", "PHX"], stops: [
+      S(510, "Leave Phoenix", "No dawn start: Sedona is two hours up I-17, and the light gets good in the afternoon.", { s: ["116 mi", "~2 hrs"] }),
+      S(645, "Bell Rock Pathway", "An easy walk on the way into town, with big views of Bell Rock and Courthouse Butte for little effort.", { s: ["~2 mi", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
+      tlaq(750),
+      S(825, "Cathedral Rock", "Short and steep, with hands-on slickrock to a saddle between the spires. If it's frosty or wet, skip it, because the rock gets slippery.", { key: 1, s: ["1.2 mi RT", "740 ft"], g: "Cathedral Rock Trailhead, Sedona AZ" }),
+      chapel(930), airportMesa,
+      S(1080, "Dinner in Sedona", "Eat before you drive on. Reserve for six."),
+      S(1170, "Drive home", "Back down I-17.", { s: ["116 mi", "~2 hrs"] })] },
+  rimSunsetHome: { nav: "Grand Canyon", title: "A full day on the rim, sunset at Hopi Point", hrs: 5.25, roads: "US-180 north · park fee per vehicle · I-17 home after dark", night: "Home", places: ["FLG", "GC", "PHX"],
+    flags: [iceFlag, ["Late Christmas Eve", "Leaving after sunset puts you home around 21:15, and the first hour back to Flagstaff is dark and can be icy. Eat at the rim, or plan a late, easy Christmas Eve dinner at home."]], stops: [
+      S(480, "Flagstaff to the South Rim", "Through ponderosa forest past the San Francisco Peaks. Check AZ511 before leaving.", { s: ["80 mi", "~1.5 hrs"] }),
+      mather(570), oohAah(615),
+      S(765, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
+      rimTrail(825), hermit(900), hopiSunset,
+      S(1050, "Drive home", "Back through Flagstaff and down I-17. Swap drivers.", { s: ["230 mi", "~3.75 hrs"] }),
+      S(1275, "Home for Christmas Eve", "A late, low-key dinner at home.", { key: 1 })] },
 
   sedonaToFlag: (fromPhx) => ({ nav: "Sedona → Flagstaff", title: fromPhx ? "Phoenix to red rock to the pines" : "Red rock morning, up to the pines",
     hrs: fromPhx ? 3 : 1, roads: fromPhx ? "I-17 → SR-179 → SR-89A" : "SR-89A through Oak Creek Canyon", night: "Flagstaff",
@@ -116,13 +139,16 @@ const T = {
       S(780, "Down to Phoenix", "US-89 to Flagstaff, then I-17. About 3.5 hours with a stop.", { s: ["~200 mi"] }),
       S(1020, "Home for Christmas Eve", "Unpack, shower, Christmas Eve dinner.", { key: 1 })] },
 
-  canyonViaSedonaHome: { nav: "Rim → Sedona → home", title: "Sunrise, Oak Creek, red rock sunset", hrs: 4.5, roads: "US-180 → SR-89A → I-17", night: "Home", places: ["GC", "FLG", "SED", "PHX"], stops: [
+  canyonViaSedonaHome: { nav: "Rim → Sedona → home", title: "Canyon sunrise to Sedona sunset, home for Christmas Eve", hrs: 4.5, roads: "US-180 → SR-89A → I-17", night: "Home", places: ["GC", "FLG", "SED", "PHX"], stops: [
       sunriseRim,
       S(540, "Back to Flagstaff", "Same road you came in on, in morning light.", { s: ["80 mi", "~1.5 hrs"] }),
       S(660, "Lunch in downtown Flagstaff", "Route 66 diners and brewpubs."),
       S(765, "Down Oak Creek Canyon", "Steep and winding, with a red rock reveal at the bottom. Take I-17 if it's icy.", { key: 1, s: ["30 mi", "~50 min"], g: "Oak Creek Vista, AZ" }),
-      chapel(855), airportMesa,
-      S(1035, "Drive home", "Down I-17 in the dark. Swap drivers.", { s: ["116 mi", "~2 hrs"] })] },
+      chapel(855),
+      S(900, "Bell Rock Pathway", "A short, flat walk under Bell Rock before sunset.", { s: ["~1.5 mi", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
+      airportMesa,
+      S(1035, "Drive home", "Down I-17 in the dark. Swap drivers.", { s: ["116 mi", "~2 hrs"] }),
+      S(1155, "Home for Christmas Eve", "Christmas Eve dinner around 19:30.", { key: 1 })] },
 
   flagCanyonHome: { nav: "Rim → home", title: "Rim day, then down to Phoenix", hrs: 5.25, roads: "US-180 → I-17", night: "Home", places: ["FLG", "GC", "PHX"], stops: [
       S(450, "Up to the South Rim", "Through the pines past the San Francisco Peaks.", { s: ["80 mi", "~1.5 hrs"] }),
@@ -186,7 +212,7 @@ const FUN = {
 
 /* ---------- state + URL hash ---------- */
 const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), xmas: Object.keys(XMAS), snow: ["go", "sedona"] };
-const DEFAULT = { route: "rim", d22: "dutchman", xmas: "sedona", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
+const DEFAULT = { route: "twosun", d22: "dutchman", xmas: "slow", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
 let state = JSON.parse(JSON.stringify(DEFAULT));
 
 function readHash() {
@@ -247,11 +273,9 @@ function build(s) {
 
   // Dec 23–24: the road trip
   let seq = [];
-  if (s.route === "rim") seq = [T.canyonFromPhx, T.canyonHome];
-  if (s.route === "rimsedona") seq = [T.canyonFromPhx, T.canyonViaSedonaHome];
-  if (s.route === "flag") seq = [T.sedonaToFlag(true), T.flagCanyonHome];
+  seq = s.route === "sedfirst" ? [T.sedonaSunsetToFlag, T.rimSunsetHome] : [T.canyonFromPhx, T.canyonViaSedonaHome];
   const snowAlt = s.t.snow && s.snow !== "go" && NORTH.includes(s.route);
-  if (snowAlt) seq = [T.sedonaSnowDay];
+  if (snowAlt) seq = [T.sedonaSunsetHome];
 
   seq.forEach((tpl, i) => {
     const idx = 2 + i, d = clone(tpl);
@@ -259,7 +283,7 @@ function build(s) {
     if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "Check AZ511 before every drive and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.split) days[idx].flags.push(["Split crew", "Part of the crew takes this trip, the rest stay in Phoenix on the downtime plan. Meet back up for Christmas Eve."]);
   });
-  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version swaps the canyon for a Sedona day trip, below most of it, and keeps Christmas Eve in Phoenix."]);
+  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version skips the canyon, does Sedona with its sunset on Dec 23, and has Christmas Eve in Phoenix."]);
 
   // Christmas Eve
   const eve = days[3];
@@ -274,7 +298,7 @@ function build(s) {
 
   // Christmas Day
   const xmas = days[4];
-  const sawSedona = ["rimsedona", "flag"].includes(s.route) || snowAlt;
+  const sawSedona = true; // every plan now has Sedona on Dec 23
   Object.assign(xmas, { nav: "Christmas", title: "Christmas at home", free: 0 });
   if (s.xmas === "sedona") {
     Object.assign(xmas, { nav: "Christmas · Sedona", title: "Christmas morning in Sedona, home by 2 pm", hrs: 4, roads: "I-17 ⇄ SR-179", places: ["PHX", "SED", "PHX"] });
@@ -288,7 +312,7 @@ function build(s) {
       S(1020, "Gifts", ""), S(1170, "Movie night", ""));
     xmas.flags.push(["Christmas morning in Sedona", "Trails and viewpoints are open, but most cafés and shops are closed, so bring food. Most trailhead lots need a Red Rock Pass."]);
     xmas.flags.push(["Frosty start", "Expect around 31°F (−1°C) at the trailhead at 08:15, warming to the mid-50s by noon. Frost makes Cathedral Rock's slickrock slippery. If it's white or wet, walk the Bell Rock Pathway instead."]);
-    if (sawSedona) xmas.flags.push(["Sedona twice?", "This plan already passes through Sedona, so a local hike might make a better Christmas morning."]);
+    if (sawSedona) xmas.flags.push(["Sedona twice?", "You'll already have had a Sedona sunset, so a local hike or a slow morning might make a better Christmas."]);
   } else {
     if (s.xmas === "hike") xmas.stops.push(S(450, "Christmas-morning hike", "Piestewa Peak, or the gentler Gateway Loop in the McDowell Sonoran Preserve. Trails are empty today.", { g: "Gateway Trailhead, Scottsdale AZ" }));
     xmas.stops.push(S(600, "Gifts and a slow breakfast", "", { key: 1 }), S(810, "Christmas lunch", "The big meal of the trip.", { key: 1 }),
@@ -313,9 +337,9 @@ function build(s) {
 function contingencies(s) {
   const out = [];
   if (NORTH.includes(s.route)) {
-    out.push(["If it snows up north", { go: "Go carefully", sedona: "Sedona day trip instead" }[s.snow],
+    out.push(["If it snows up north", { go: "Go carefully", sedona: "Sedona only" }[s.snow],
       { go: "Check AZ511 and the Grand Canyon NPS alerts each morning, drive in daylight, and skip any closed road.",
-        sedona: "Skip the canyon. Do Sedona as a day trip (about 4,300 ft, usually clear) and spend Christmas Eve in Phoenix." }[s.snow]]);
+        sedona: "Keep the Sedona afternoon and sunset (about 4,300 ft, usually clear), drive home that night, and spend Christmas Eve in Phoenix." }[s.snow]]);
     out.push(["If a road closes mid-trip", "Stay put", "I-17, I-40, US-180 and AZ-64 all close for storms now and then. Stay where you are and wait for AZ511 to clear it. Avoid 89A through Oak Creek Canyon in ice."]);
   }
   out.push(["If work runs late on Dec 22", "Stay close", "Swap to the Botanical Garden and Hole-in-the-Rock, 15 minutes away, and still catch the sunset."]);
@@ -428,11 +452,11 @@ function seg(key, opts, { multi = false, cls = "", get, set } = {}) {
 
 function renderControls() {
   const rows = [
-    ["Dec 23–24 trip", "Both days off. Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
+    ["Dec 23–24 trip", "Which sunset comes first. Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
   ];
   rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
   rows.push(["Christmas morning", "Back by 2–3 pm", seg("xmas", Object.entries(XMAS))]);
-  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona day trip instead"]])]);
+  if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona only, home that night"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
 }
