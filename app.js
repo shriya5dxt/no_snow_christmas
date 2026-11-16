@@ -14,6 +14,7 @@ const PLACES = {
   GC: { name: "Grand Canyon", elev: 7000 },
   JER: { name: "Jerome", elev: 5200 },
   MON: { name: "Verde Valley", elev: 3200 },
+  PAGE: { name: "Page", elev: 4300 },
   SUP: { name: "Superstitions", elev: 2000 },
   SALT: { name: "Salt River", elev: 1500 },
 };
@@ -24,6 +25,7 @@ const WX = {
   GC: { hi: 41, lo: 18, note: "Real winter on the rim. Snow and wind are common, and sunrise often feels like 5°F (−15°C) with wind chill." },
   FLG: { hi: 43, lo: 17, note: "Real winter. Snow is common, and nights are well below freezing." },
   JER: { hi: 50, lo: 32, note: "A hillside town: windier and a little colder than Sedona." },
+  PAGE: { hi: 45, lo: 26, note: "Clear and dry, with cold mornings. Wind on the rim at Horseshoe Bend makes it feel colder." },
   SED: { hi: 56, lo: 31, note: "Sunny, mild afternoons and frosty mornings. Snow is rare and usually gone by noon." },
   MON: { hi: 59, lo: 28, note: "Mild days, cold nights." },
   SUP: { hi: 65, lo: 42, note: "Like Phoenix, but it cools quickly once the sun drops behind the mountains." },
@@ -35,16 +37,16 @@ const temp = (f) => `${f}°F (${toC(f)}°C)`;
 
 /* ---------- stop helper ---------- */
 const S = (t, h, p, o = {}) => ({ t, h, p, s: o.s, g: o.g, key: !!o.key });
-const NORTH = ["twosun", "sedfirst"]; // routes that climb above the snow line
+const NORTH = ["pageloop", "twosun"]; // routes that climb above the snow line
 
 // The Dec 23–24 road trip (both days off for everyone)
 const ROUTES = {
-  twosun: { letter: "A", short: "Canyon sunset, then Sedona sunset", name: "Two sunsets", head: "Grand Canyon sunset Dec 23, Sedona sunset Dec 24",
-    desc: "Dec 23: up through Flagstaff for Ooh Aah Point, Hermit Road and sunset at Hopi Point, and a night at the canyon. Dec 24: rim sunrise, down Oak Creek Canyon to Sedona, sunset at Airport Mesa, home around 19:15.",
-    best: "Both sunsets plus a canyon sunrise, and home for Christmas Eve dinner." },
-  sedfirst: { letter: "B", short: "Sedona sunset, then canyon sunset", name: "Two sunsets, reversed", head: "Sedona sunset Dec 23, Grand Canyon sunset Dec 24",
-    desc: "Dec 23: an easy start, red rock all afternoon, sunset at Airport Mesa, then a night in Flagstaff. Dec 24: a full day on the rim with Ooh Aah Point and sunset at Hopi Point, home around 21:15.",
-    best: "A slower first morning, but a late Christmas Eve and a dark drive home." },
+  pageloop: { letter: "A", short: "Canyon, Page, Sedona", name: "The big loop", head: "Canyon Dec 22, Page Dec 23, Sedona Dec 24",
+    desc: "Dec 22: leave in the morning for the Grand Canyon, with Ooh Aah Point and sunset at Hopi Point, then a night in Flagstaff. Dec 23: Antelope Canyon and Horseshoe Bend in Page, then down to Sedona for the night. Dec 24: a slow Sedona day, sunset at Airport Mesa, home around 19:45.",
+    best: "The most you can fit in three days, with two sunsets and two nights away." },
+  twosun: { letter: "B", short: "Two sunsets", name: "Two sunsets", head: "Grand Canyon sunset Dec 23, Sedona sunset Dec 24",
+    desc: "Dec 22: a local outing after work. Dec 23: Ooh Aah Point, Hermit Road and sunset at Hopi Point, and a night at the canyon. Dec 24: rim sunrise, down Oak Creek Canyon to Sedona, sunset at Airport Mesa, home around 19:15.",
+    best: "Both sunsets, no Page, and a much shorter Dec 23." },
 };
 
 // Dec 22: everyone is free from 3 pm Central = 2 pm Arizona
@@ -89,6 +91,35 @@ const RIM_NIGHT = "In-park lodges (El Tovar, Bright Angel, Maswik) are steps fro
 
 /* ---------- day templates ---------- */
 const T = {
+  phxCanyonToFlag: { nav: "Grand Canyon → Flagstaff", title: "Grand Canyon day, sunset at Hopi Point", hrs: 5.25, roads: "I-17 → US-180 north · park fee per vehicle · back to Flagstaff after dark", night: "Flagstaff",
+    nightNote: "Downtown Flagstaff is walkable, has the most beds, and is on the way to Page tomorrow.", places: ["PHX", "FLG", "GC", "FLG"],
+    flags: [iceFlag, altFlag, ["Drive back in the dark", "US-180 from the rim to Flagstaff is unlit and can be icy after sunset. Watch for elk, and check AZ511 before you set off."]], stops: [
+      S(420, "Leave Phoenix", "Up I-17 through Flagstaff, then US-180 to the South Rim.", { s: ["230 mi", "~3.75 hrs"] }),
+      S(555, "Coffee stop in Flagstaff", "Halfway, and the last cheap coffee."),
+      mather(660), oohAah(705),
+      S(840, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
+      rimTrail(885), hermit(930), hopiSunset,
+      S(1050, "Back to Flagstaff", "US-180 south.", { s: ["80 mi", "~1.5 hrs"] }),
+      S(1155, "Dinner in downtown Flagstaff", "A Route 66 brewery town, so it's easy to find a table for six.", { g: "Downtown Flagstaff, AZ" })] },
+  flagPageSedona: { nav: "Page → Sedona", title: "Antelope Canyon, Horseshoe Bend, and a night in Sedona", hrs: 5.25, roads: "US-89 north · US-89 south → I-17 → SR-179", night: "Sedona",
+    nightNote: "You'll arrive in the evening, so pick somewhere with easy check-in. West Sedona and the Village of Oak Creek are cheaper than Uptown.", places: ["FLG", "PAGE", "FLG", "SED"],
+    flags: [["Book the tour first", "Antelope Canyon is by Navajo-guided tour only, and slots sell out. Book a midday slot (about 12:00) and fit the rest of the day around it."],
+      ["Night drive", "Take I-17 and SR-179 into Sedona, not the 89A switchbacks through Oak Creek Canyon, which can ice up after dark."]], stops: [
+      S(510, "Leave Flagstaff", "US-89 north past the Painted Desert and the Echo Cliffs.", { s: ["~135 mi", "~2h15"] }),
+      S(660, "Glen Canyon Dam overlook", "A quick stop above the dam and Lake Powell on the way into Page.", { g: "Glen Canyon Dam Overlook, Page AZ" }),
+      S(720, "Antelope Canyon tour", "A slot canyon of curving sandstone. Midday gets the best light inside. Upper is flat and easy; Lower has ladders and smaller crowds.", { key: 1, s: ["~1.5 hrs", "guided only"], g: "Upper Antelope Canyon, AZ" }),
+      S(825, "Lunch in Page", "Casual places along Lake Powell Blvd."),
+      S(900, "Horseshoe Bend", "The Colorado River curls 270° around a sandstone tower, 1,000 ft below an unfenced edge. A flat, sandy walk, and there's a parking fee. Staying for sunset (~17:10) puts you in Sedona around 20:30.", { key: 1, s: ["1.5 mi RT"], g: "Horseshoe Bend, Page AZ" }),
+      S(990, "Drive to Sedona", "US-89 south to Flagstaff, then I-17 and SR-179.", { s: ["~165 mi", "~3 hrs"] }),
+      S(1170, "Late dinner in Sedona", "", { key: 1 })] },
+  sedonaChillHome: { nav: "Sedona → home", title: "A slow Sedona day, sunset, home for Christmas Eve", hrs: 2, roads: "SR-179 → I-17 south", night: "Home", places: ["SED", "PHX"],
+    flags: [["Christmas Eve", "Sedona shops and restaurants may close early today, so book lunch. Plan Christmas Eve dinner at home around 20:00."]], stops: [
+      S(540, "Slow morning", "Sleep in after the big day, then coffee and breakfast in town."),
+      redRockHike(660), tlaq(810), chapel(900),
+      S(945, "Bell Rock Pathway", "A short, flat walk under Bell Rock before sunset.", { s: ["~1.5 mi", "flat"], g: "Bell Rock Trailhead, Sedona AZ" }),
+      airportMesa,
+      S(1065, "Drive home", "Down I-17. Swap drivers.", { s: ["116 mi", "~2 hrs"] }),
+      S(1185, "Home for Christmas Eve", "", { key: 1 })] },
   sedonaSunsetToFlag: { nav: "Sedona → Flagstaff", title: "Red rock afternoon, Sedona sunset", hrs: 3.25, roads: "I-17 north → SR-179 · I-17 to Flagstaff after dark", night: "Flagstaff",
     nightNote: "Downtown Flagstaff is walkable, has the most beds, and is 1.5 hours from the rim.", places: ["PHX", "SED", "FLG"],
     flags: [["After dark", "Take SR-179 and I-17 up to Flagstaff, not the 89A switchbacks through Oak Creek Canyon, which can ice up at night."], altFlag], stops: [
@@ -210,7 +241,7 @@ const FUN = {
 
 /* ---------- state + URL hash ---------- */
 const OPTS = { route: Object.keys(ROUTES), d22: Object.keys(D22), snow: ["go", "sedona"] };
-const DEFAULT = { route: "twosun", d22: "dutchman", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
+const DEFAULT = { route: "pageloop", d22: "dutchman", snow: "sedona", fun: ["hike", "scottsdale", "games"], t: {}, shift: {}, done: [], votes: {} };
 let state = JSON.parse(JSON.stringify(DEFAULT));
 
 function readHash() {
@@ -271,17 +302,19 @@ function build(s) {
 
   // Dec 23–24: the road trip
   let seq = [];
-  seq = s.route === "sedfirst" ? [T.sedonaSunsetToFlag, T.rimSunsetHome] : [T.canyonFromPhx, T.canyonViaSedonaHome];
+  let start = 2;
+  if (s.route === "pageloop") { seq = [T.phxCanyonToFlag, T.flagPageSedona, T.sedonaChillHome]; start = 1; }
+  else seq = [T.canyonFromPhx, T.canyonViaSedonaHome];
   const snowAlt = s.t.snow && s.snow !== "go" && NORTH.includes(s.route);
-  if (snowAlt) seq = [T.sedonaSunsetHome];
+  if (snowAlt) { seq = [T.sedonaSunsetHome]; start = 2; }
 
   seq.forEach((tpl, i) => {
-    const idx = 2 + i, d = clone(tpl);
+    const idx = start + i, d = clone(tpl);
     Object.assign(days[idx], d, { away: true, free: 0, flags: d.flags || [] });
     if (s.t.snow && s.snow === "go" && d.places.some((k) => PLACES[k].elev > SNOW_LINE)) days[idx].flags.push(["Snow plan: go carefully", "Check AZ511 before every drive and add buffer time. Skip any road that's closed rather than wait it out."]);
     if (s.t.split) days[idx].flags.push(["Split crew", "Part of the crew takes this trip, the rest stay in Phoenix on the downtime plan. Meet back up for Christmas Eve."]);
   });
-  if (snowAlt) days[2].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version skips the canyon, does Sedona with its sunset on Dec 23, and has Christmas Eve in Phoenix."]);
+  if (snowAlt) days[start].flags.unshift(["Plan B is on", "Snow is forecast up north, so this version skips the canyon, does Sedona with its sunset on Dec 23, and has Christmas Eve in Phoenix."]);
 
   // Christmas Eve
   const eve = days[3];
@@ -290,7 +323,7 @@ function build(s) {
     eve.stops.push(S(600, "Christmas groceries", "Most shops close early today and nearly everything is shut tomorrow.", { key: 1 }),
       S(1110, "Christmas Eve dinner", "At home, all six.", { key: 1 }),
       S(1230, "Neighbourhood lights", "A slow drive around to see the holiday lights."));
-  } else {
+  } else if (!days[1].away) {
     d22.stops.push(S(1200, "Christmas grocery run", "You're away until the evening of Christmas Eve, and almost everything is closed on Christmas Day, so stock up tonight."));
   }
 
@@ -342,6 +375,7 @@ function checklist(days) {
   if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
   if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. Buy ahead at recreation.gov or pay at the gate."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
+  if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 23, about 12:00", "Navajo-guided tours only, and they sell out weeks ahead. Book this before the hotels and build the day around it."]);
   if (pl.has("SALT")) items.push(["tonto", "Tonto Pass for Coon Bluff / Saguaro Lake parking", "Day pass per vehicle. Buy online or at a local gas station before you go."]);
   if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A and along parts of the rim."]);
   if (state.fun.includes("balloon")) items.push(["balloon", "Sunrise balloon ride", "Holiday weeks book up. Pick an early date to leave a backup day."]);
@@ -434,9 +468,9 @@ function seg(key, opts, { multi = false, cls = "", get, set } = {}) {
 
 function renderControls() {
   const rows = [
-    ["Dec 23–24 trip", "Which sunset comes first. Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
+    ["The trip", "Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
   ];
-  rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
+  if (state.route !== "pageloop" || (state.t.snow && state.snow === "sedona")) rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
   if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona only, home that night"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
