@@ -41,12 +41,12 @@ const NORTH = ["pageloop", "twosun"]; // routes that climb above the snow line
 
 // The Dec 23–24 road trip (both days off for everyone)
 const ROUTES = {
-  pageloop: { letter: "A", short: "Canyon, Page, Sedona", name: "The big loop", head: "Canyon Dec 22, Page Dec 23, Sedona Dec 24",
-    desc: "Dec 22: leave in the morning for the Grand Canyon, with Ooh Aah Point and sunset at Hopi Point, then a night in Flagstaff. Dec 23: Antelope Canyon and Horseshoe Bend in Page, then down to Sedona for the night. Dec 24: a slow Sedona day, sunset at Airport Mesa, home around 19:45.",
-    best: "The most you can fit in three days, with two sunsets and two nights away." },
-  twosun: { letter: "B", short: "Two sunsets", name: "Two sunsets", head: "Grand Canyon sunset Dec 23, Sedona sunset Dec 24",
-    desc: "Dec 22: a local outing after work. Dec 23: Ooh Aah Point, Hermit Road and sunset at Hopi Point, and a night at the canyon. Dec 24: rim sunrise, down Oak Creek Canyon to Sedona, sunset at Airport Mesa, home around 19:15.",
-    best: "Both sunsets, no Page, and a much shorter Dec 23." },
+  pageloop: { letter: "A", short: "Canyon, Page, Sedona", name: "Canyon, Page and Sedona", head: "Canyon sunrise + Horseshoe Bend Dec 23, Antelope + Sedona Dec 24",
+    desc: "Dec 22: leave at 3 pm, evening in Flagstaff. Dec 23: rim sunrise, Ooh Aah Point and Desert View Drive, then north to Page for sunset at Horseshoe Bend. Dec 24: Antelope Canyon in the morning, Sedona in the afternoon with sunset at Airport Mesa, home around 19:45.",
+    best: "The most sights: canyon, Page and Sedona. Two early starts and the most driving." },
+  twosun: { letter: "B", short: "Canyon, Sedona", name: "Canyon and Sedona", head: "A full canyon day Dec 23, Sedona Dec 24",
+    desc: "Dec 22: leave at 3 pm, evening in Flagstaff. Dec 23: Ooh Aah Point, Hermit Road and sunset at Hopi Point, with a night at the canyon. Dec 24: rim sunrise, down Oak Creek Canyon to Sedona, sunset at Airport Mesa, home around 19:15.",
+    best: "Two sunsets and an easier pace. No Page." },
 };
 
 // Dec 22: everyone is free from 3 pm Central = 2 pm Arizona
@@ -91,6 +91,45 @@ const RIM_NIGHT = "In-park lodges (El Tovar, Bright Angel, Maswik) are steps fro
 
 /* ---------- day templates ---------- */
 const T = {
+  toFlagEvening: { nav: "Flagstaff", title: "Leave at 3, evening in Flagstaff", hrs: 2.25, roads: "Loop 101 → I-17 north", night: "Flagstaff",
+    nightNote: "Downtown Flagstaff is walkable, has the most beds and restaurants, and is 1.5 hours from the rim.", places: ["PHX", "FLG"],
+    flags: [
+      ["Snow on the way up", "The last 30 miles of I-17, from Munds Park to Flagstaff, climb to 7,000 ft, and that's where snow and ice show up first. You'll drive it at dusk, so check AZ511 before leaving, slow down after dark, and keep the tank above half."],
+      ["If it's snowed", "Fresh snow around Flagstaff is the best snow play in Arizona. Arizona Snowbowl and the Flagstaff Snow Park run tubing during the day. Use those, not the US-180 shoulders, where parking causes jams and tickets. Fit it in on the morning of Dec 23 only if you're doing option B."],
+      ["Optional: the Polar Express", "The Grand Canyon Railway runs a Polar Express train from Williams, 35 minutes west, on December evenings. It's fun for a group but sells out months ahead, so book now if you want it."],
+      altFlag], stops: [
+      S(840, "Done with work", "3 pm Central is 2 pm in Arizona. Pack the car the night before.", { key: 1 }),
+      S(900, "Leave for Flagstaff", "Up I-17 from saguaros to pines.", { s: ["~145 mi", "~2h15"] }),
+      S(975, "Sunset Point rest area", "A quick leg-stretch about an hour north, with views over the Bradshaw Mountains.", { g: "Sunset Point Rest Area, AZ" }),
+      S(1050, "Check in, Flagstaff", "You'll arrive around dusk (sunset ~17:25). It drops below freezing fast up here.", { key: 1 }),
+      S(1110, "Dinner downtown", "A Route 66 brewery town with the holiday lights up, and easy to find a table for six.", { g: "Downtown Flagstaff, AZ" }),
+      S(1215, "Lowell Observatory (optional)", "Telescope viewing on the hill above downtown, where Pluto was discovered. Flagstaff was the world's first International Dark Sky City. Check the holiday schedule and book ahead.", { g: "Lowell Observatory, Flagstaff AZ" })] },
+  flagCanyonPage: { nav: "Canyon → Page", title: "Canyon sunrise to Horseshoe Bend sunset", hrs: 4, roads: "US-180 → Desert View Dr → US-89 north · park fee per vehicle", night: "Page",
+    nightNote: "Page has plenty of chain hotels, much cheaper than the rim.", places: ["FLG", "GC", "PAGE"],
+    flags: [iceFlag, ["Dark, cold start", "Leave Flagstaff at 05:45. US-180 is unlit, and ice on shaded curves and elk are the hazards. The rim at sunrise is usually around 18°F (−8°C) before wind chill."]], stops: [
+      S(345, "Leave Flagstaff", "Up US-180 in the dark.", { s: ["80 mi", "~1.5 hrs"] }),
+      sunriseRim, oohAah(495), mather(630), desertView(690), cameron(780),
+      S(840, "North to Page", "Past the Echo Cliffs to Lake Powell.", { s: ["~85 mi", "~1h20"] }),
+      S(940, "Glen Canyon Dam overlook", "A quick stop above the dam and Lake Powell.", { g: "Glen Canyon Dam Overlook, Page AZ" }),
+      S(1000, "Sunset at Horseshoe Bend", "The Colorado River curls 270° around a sandstone tower, 1,000 ft below an unfenced edge. A flat, sandy walk, and there's a parking fee. Get there by 16:40, because sunset is around 17:10.", { key: 1, s: ["1.5 mi RT"], g: "Horseshoe Bend, Page AZ" }),
+      S(1110, "Dinner in Page", "Casual places along Lake Powell Blvd.")] },
+  pageSedonaHome: { nav: "Page → Sedona → home", title: "Antelope Canyon, Sedona sunset, home for Christmas Eve", hrs: 5, roads: "US-89 south → SR-89A (Oak Creek Canyon) → I-17", night: "Home", places: ["PAGE", "FLG", "SED", "PHX"],
+    flags: [["Antelope on Christmas Eve", "Tours run on fixed slots and sell out. Book the first slot of the morning and confirm they run on Dec 24. If they don't, swap the dam overlook on Dec 23 for the tour."],
+      ["Oak Creek Canyon", "In daylight, the 89A switchbacks down into Sedona are the prettiest way in. If AZ511 shows ice, take I-17 to SR-179 instead."]], stops: [
+      S(510, "Antelope Canyon tour", "A slot canyon of curving sandstone, by Navajo-guided tour only. Upper is flat and easy; Lower has ladders and smaller crowds.", { key: 1, s: ["~1.5 hrs", "guided only"], g: "Upper Antelope Canyon, AZ" }),
+      S(615, "Drive to Sedona", "US-89 south to Flagstaff, then down Oak Creek Canyon.", { s: ["~165 mi", "~3 hrs"] }),
+      tlaq(810),
+      S(870, "Cathedral Rock or Bell Rock", "Cathedral Rock is short and steep slickrock. The Bell Rock Pathway is flat and easy. Pick by energy level and by whether the rock is dry.", { key: 1, s: ["1.2 mi RT · 740 ft", "or ~2 mi flat"], g: "Cathedral Rock Trailhead, Sedona AZ" }),
+      airportMesa,
+      S(1065, "Drive home", "Down I-17. Swap drivers.", { s: ["116 mi", "~2 hrs"] }),
+      S(1185, "Home for Christmas Eve", "", { key: 1 })] },
+  flagCanyonSunset: { nav: "Grand Canyon", title: "A full day on the rim, sunset at Hopi Point", hrs: 1.5, roads: "US-180 north · park fee per vehicle", night: "Grand Canyon",
+    nightNote: RIM_NIGHT, places: ["FLG", "GC"], flags: [iceFlag, ["Snow-day option", "If it's snowed overnight and the roads are clear, spend an hour tubing at Arizona Snowbowl or the Flagstaff Snow Park before heading up, and drop the Rim Trail."]], stops: [
+      S(450, "Flagstaff to the South Rim", "Through ponderosa forest past the San Francisco Peaks. Check AZ511 first.", { s: ["80 mi", "~1.5 hrs"] }),
+      mather(555), oohAah(600),
+      S(750, "Lunch in the Village", "Bright Angel Lodge, or the Market Plaza deli."),
+      rimTrail(810), hermit(870), hopiSunset,
+      S(1110, "Dinner, then stars", "There's almost no light pollution here. Step outside after dinner.")] },
   phxCanyonToFlag: { nav: "Grand Canyon → Flagstaff", title: "Grand Canyon day, sunset at Hopi Point", hrs: 5.25, roads: "I-17 → US-180 north · park fee per vehicle · back to Flagstaff after dark", night: "Flagstaff",
     nightNote: "Downtown Flagstaff is walkable, has the most beds, and is on the way to Page tomorrow.", places: ["PHX", "FLG", "GC", "FLG"],
     flags: [iceFlag, altFlag, ["Drive back in the dark", "US-180 from the rim to Flagstaff is unlit and can be icy after sunset. Watch for elk, and check AZ511 before you set off."]], stops: [
@@ -303,8 +342,8 @@ function build(s) {
   // Dec 23–24: the road trip
   let seq = [];
   let start = 2;
-  if (s.route === "pageloop") { seq = [T.phxCanyonToFlag, T.flagPageSedona, T.sedonaChillHome]; start = 1; }
-  else seq = [T.canyonFromPhx, T.canyonViaSedonaHome];
+  start = 1;
+  seq = s.route === "pageloop" ? [T.toFlagEvening, T.flagCanyonPage, T.pageSedonaHome] : [T.toFlagEvening, T.flagCanyonSunset, T.canyonViaSedonaHome];
   const snowAlt = s.t.snow && s.snow !== "go" && NORTH.includes(s.route);
   if (snowAlt) { seq = [T.sedonaSunsetHome]; start = 2; }
 
@@ -375,7 +414,8 @@ function checklist(days) {
   if (pl.has("GC")) items.push(["microspikes", "Microspikes for everyone", "For Ooh Aah Point. The top of the South Kaibab Trail is packed ice in December. About $20–30 a pair."]);
   if (pl.has("GC")) items.push(["gc-pass", "Grand Canyon entry", "Charged per vehicle and valid for 7 days. Buy ahead at recreation.gov or pay at the gate."]);
   if (pl.has("SED")) items.push(["redrock", "Red Rock Pass for Sedona trailheads", "Required at most trailhead lots. An America the Beautiful pass also counts."]);
-  if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 23, about 12:00", "Navajo-guided tours only, and they sell out weeks ahead. Book this before the hotels and build the day around it."]);
+  if (pl.has("PAGE")) items.push(["antelope", "Antelope Canyon tour, Dec 24, first morning slot", "Navajo-guided tours only, and they sell out weeks ahead. Confirm they run on Christmas Eve."]);
+  items.push(["polar", "Polar Express tickets, Dec 22 evening (optional)", "From Williams, 35 minutes west of Flagstaff. It sells out months ahead."]);
   if (pl.has("SALT")) items.push(["tonto", "Tonto Pass for Coon Bluff / Saguaro Lake parking", "Day pass per vehicle. Buy online or at a local gas station before you go."]);
   if ([...pl].some((k) => k !== "PHX" && PLACES[k].elev > SNOW_LINE)) items.push(["offline", "Download offline maps for northern Arizona", "Coverage drops out on 89A and along parts of the rim."]);
   if (state.fun.includes("balloon")) items.push(["balloon", "Sunrise balloon ride", "Holiday weeks book up. Pick an early date to leave a backup day."]);
@@ -470,7 +510,7 @@ function renderControls() {
   const rows = [
     ["The trip", "Pick one, or vote below", seg("route", Object.entries(ROUTES).map(([k, r]) => [k, `${r.letter} · ${r.short}`]))],
   ];
-  if (state.route !== "pageloop" || (state.t.snow && state.snow === "sedona")) rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
+  if (state.t.snow && state.snow === "sedona") rows.unshift(["Tue Dec 22, after 2 pm", "Free from 3 pm Central = 2 pm here", seg("d22", Object.entries(D22).map(([k, d]) => [k, d.short]))]);
   if (NORTH.includes(state.route)) rows.push(["If it snows up north", "Used when the snow switch is on", seg("snow", [["go", "Go carefully"], ["sedona", "Sedona only, home that night"]])]);
   rows.push(["What if", "Switch on to see the plan change", seg("t", [["snow", "Snow forecast"], ["split", "Some skip the drive"]], { multi: true, cls: "whatif", get: (v) => !!state.t[v] })]);
   $("controls").innerHTML = rows.map(([l, sub, c]) => `<div class="ctrl"><div class="seg-label">${l}${sub ? `<small>${sub}</small>` : ""}</div>${c}</div>`).join("");
